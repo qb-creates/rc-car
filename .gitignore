@@ -1,41 +1,51 @@
-# Prerequisites
-*.d
+.pio
+.vscode
+**/.gitignore
+**/*-backups
+package.json
 
-# Compiled Object files
-*.slo
-*.lo
+#Build Directories
+[Dd]ebug/
+[Rr]elease/
+
+#Build Results
 *.o
-*.obj
+*.d
+*.eep
+*.elf
+*.hex
+*.map
+*.srec
 
-# Precompiled Headers
-*.gch
-*.pch
+#User Specific Files
+*.atsuo
 
-# Linker files
-*.ilk
+# For PCBs designed using KiCad: http://www.kicad-pcb.org/
+# Format documentation: http://kicad-pcb.org/help/file-formats/
 
-# Debugger Files
-*.pdb
+# Directories
+gerber
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Temporary files
+*.000
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.sch-bak
+*~
+_autosave-*
+*.tmp
+*-save.pro
+*-save.kicad_pcb
+fp-info-cache
 
-# Fortran module files
-*.mod
-*.smod
+# Netlist files (exported from Eeschema)
+*.net
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# Autorouter files (exported from Pcbnew)
+*.dsn
+*.ses
 
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
+# Exported BOM files
+*.xml
+*.csv
