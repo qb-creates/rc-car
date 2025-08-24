@@ -95,7 +95,7 @@ void setMotorDirection(bool forward)
     PORTC = 0;
 
     // Wait 1 second for the outputs to turn off
-    _delay_ms(1000);
+    _delay_ms(500);
 
     // Turn on our reverse latch
     PORTC = forward ? _BV(PC0) : _BV(PC2);
