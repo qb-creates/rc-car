@@ -43,29 +43,9 @@ void rfTransmitData(MotorControlPayload payload)
 {
     bool report = radio.write(&payload, sizeof(payload));
 
-    if (report)
+    if (!report)
     {
-        usartTransmit("\x1B[3A", 4);
-        usartTransmit("\rMotor 1: ", 10);
-
-        if (payload.ocrMotor < 0)
-        {
-            usartTransmit("-", 1);
-            uart_send_uint8_as_ascii(payload.ocrMotor * -1);
-        }
-        else
-        {
-            uart_send_uint8_as_ascii(payload.ocrMotor);
-        }
-
-        usartTransmit("  \r\n", 4);
-        usartTransmit("Motor 2: ", 9);
-        uart_send_uint8_as_ascii(payload.ocrSteering);
-        usartTransmit("  ", 2);
-    }
-    else
-    {
-        usartTransmit("Transmission failed or timed out\r\n", 35);
+        // usartTransmit("Transmission failed or timed out\r\n", 35);
     }
 }
 

@@ -11,59 +11,88 @@
 #include <string.h>
 #include <util/delay.h>
 
-extern "C" void __cxa_pure_virtual()
+#define BOOST_TIME 2000
+#define BOOST_COOLDOWN_TIME 4000
+
+bool boostEnabled = false;
+bool boostCooldown = false;
+int16_t boostCounter = 0;
+int16_t boostCooldownCounter = 0;
+
+void initializeBoostTimer(void)
 {
+    // CTC mode (WGM32 = 1)
+    TCCR3A = 0;
+    TCCR3B = (1 << WGM32) | (1 << CS31); // CTC, prescaler = 8
+
+    // gives us a 1ms delay
+    OCR3A = 999;
+
+    // Disable all interrupts
+    TIMSK3 = 0;
 }
 
 int main(void)
 {
-    DDRD = 0xFF;
-    PORTD = 0x00;
+    // Set DDRC to be all inputs
+    DDRC = 0x00;
 
-    TCCR0A = (1 << COM0B1) | (1 << WGM01) | (1 << WGM00);
-    TCCR0B = (1 << WGM02) | (1 << CS01); // Prescaler = 8
-    OCR0A = 49;
+    // Enable pull up resisotr for PC7.
+    PORTC = _BV(PC7);
 
     enableUSART();
-    initADC();
+    initializeBoostTimer();
+    initializeJoysticks();
     rfConfigureRadio();
 
     MotorControlPayload payload = {1, 1450};
 
     while (true)
     {
-        // Max 100
-        // int16_t speedValue = readADC(1);
-        // speedValue = 1023 - speedValue;
-        // speedValue = speedValue / 5.115;
-        // speedValue = speedValue - 100;
+        if (!boostEnabled && !boostCooldown && !(PINC & _BV(PC7)))
+        {
+            boostEnabled = true;
+            boostCounter = 0;
+        }
 
-        // Max is 40
-        // int16_t speedValue = readADC(1);
-        // speedValue = 1023 - speedValue;
-        // speedValue = speedValue / 12.7875;
-        // speedValue = speedValue - 40;
+        if (boostEnabled && boostCounter < BOOST_TIME)
+        {
+            if (TIFR3 & _BV(OCF3A))
+            {
+                // Clear overflow flag
+                TIFR3 |= _BV(OCF3A);
+                boostCounter++;
+            }
 
-        // Max is 50
-        int16_t speedValue = readADC(1);
-        speedValue = 1023 - speedValue;
-        speedValue = speedValue / 10.23;
-        speedValue = speedValue - 50;
+            if (boostCounter >= BOOST_TIME)
+            {
+                boostEnabled = false;
+                boostCooldown = true;
+            }
+        }
 
-        // Max is 60
-        // int16_t speedValue = readADC(1);
-        // speedValue = 1023 - speedValue;
-        // speedValue = speedValue / 8.525;
-        // speedValue = speedValue - 60;
+        if (boostCooldown)
+        {
+            if (TIFR3 & _BV(OCF3A))
+            {
+                // Clear overflow flag
+                TIFR3 |= _BV(OCF3A);
+                boostCooldownCounter++;
+            }
 
-        // Max is set to 1900. Min is 1000. Middle is 1450
-        uint16_t steeringValue = readADC(0);
-        steeringValue = 1023 - steeringValue;
+            if (boostCooldownCounter >= BOOST_COOLDOWN_TIME)
+            {
+                boostCooldownCounter = 0;
+                boostCounter = 0;
+                boostCooldown = false;
+            }
+        }
 
-        // Divide by 1.13666667 to get 900 and add 1000. Makes the min to max 1000 to 1900
-        steeringValue = (steeringValue / 1.1366666667) + 1000;
+        int16_t speedValue = readSpeedJoystick();
+        uint16_t steeringValue = readSteeringJoystick();
+        int16_t speedBoostValue = speedValue + (speedValue * 1.5);
 
-        payload.ocrMotor = speedValue;
+        payload.ocrMotor = boostEnabled ? speedBoostValue : speedValue;
         payload.ocrSteering = steeringValue;
         rfTransmitData(payload);
     }

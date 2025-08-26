@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 // Function declarations
-void initADC(void);
-uint16_t readADC(uint8_t channel);
-int16_t readJoystickAxis(void);
+void initializeJoysticks(void);
+int16_t readSpeedJoystick(void);
+uint16_t readSteeringJoystick(void);
 
 #endif
