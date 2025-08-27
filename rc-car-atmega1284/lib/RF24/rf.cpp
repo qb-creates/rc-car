@@ -1,5 +1,6 @@
 #include "rf.h"
 #include "usart.h"
+#include <avr/wdt.h>
 
 // nRF24L01+ Pin definitions for RF24 library
 #define CE_PIN 0
@@ -26,6 +27,8 @@ uint8_t address[][6] = {"1Node", "2Node"};
  * - 1: Uses address[1] to transmit, receives on address[0]
  */
 bool radioNumber = 0;
+
+bool rfDataReceived = false;
 
 void configureRFRadio(void)
 {
@@ -67,30 +70,18 @@ void readAndPrintRFData(MotorControlPayload *payload)
 
     if (radio.available(&pipe))
     {
-        radio.read(payload, sizeof(*payload));
+        uint8_t payloadSize = radio.getDynamicPayloadSize();        
+        radio.read(payload, sizeof(*payload));     
 
-        // if (currentMotor != payload->ocrMotor)
-        // {
-        //     currentMotor = payload->ocrMotor;
-
-        //     if (payload->ocrMotor < 0)
-        //     {
-        //         usartTransmit("-", 1);
-        //         uart_send_uint8_as_ascii(payload->ocrMotor * -1);
-        //     }
-        //     else
-        //     {
-        //         uart_send_uint8_as_ascii(payload->ocrMotor);
-        //     }
-
-        //     usartTransmit("\r\n", 2);
-        // }
-
-        // if (OCR1B != payload->ocrSteering)
-        // {
-        //     uart_send_uint8_as_ascii(payload->ocrSteering);;
-        //     usartTransmit("\r\n", 2);
-        // }        
+        if (!rfDataReceived)
+        {
+            rfDataReceived = true;
+            wdt_enable(WDTO_2S);
+        }
+        else
+        {
+            wdt_reset();
+        }
     }
 }
 

@@ -16,6 +16,10 @@ MotorControlPayload payload = {0, 1450};
 
 int main(void)
 {
+    // Clear watchdog reset flag and disable watchdog timer.
+    MCUSR &= ~(1 << WDRF);
+    wdt_disable();
+    
     DDRD = 0xFF;
     PORTD |= _BV(PD5);
 
@@ -31,15 +35,15 @@ int main(void)
 
         OCR1B = payload.ocrSteering;
 
-        if (payload.ocrMotor >= -5 && payload.ocrMotor <= 5)
+        if (payload.ocrMotor >= -15 && payload.ocrMotor <= 15)
         {
             stopMotor();
         }
-        else if (payload.ocrMotor < -5 && (!reverseMotor || motorStoped))
+        else if (payload.ocrMotor < -15 && (!reverseMotor || motorStoped))
         {
             setMotorDirection(false);
         }
-        else if (payload.ocrMotor > 5 && (reverseMotor || motorStoped))
+        else if (payload.ocrMotor > 15 && (reverseMotor || motorStoped))
         {
             setMotorDirection(true);
         }
