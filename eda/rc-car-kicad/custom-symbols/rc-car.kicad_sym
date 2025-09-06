@@ -52,7 +52,7 @@
 		(symbol "MIC3975-5.0YMM_0_1"
 			(rectangle
 				(start -5.08 6.35)
-				(end 5.08 -3.81)
+				(end 7.62 -5.08)
 				(stroke
 					(width 0)
 					(type default)
@@ -100,7 +100,7 @@
 				)
 			)
 			(pin output line
-				(at 7.62 3.81 180)
+				(at 10.16 3.81 180)
 				(length 2.54)
 				(name "FLG"
 					(effects
@@ -118,7 +118,7 @@
 				)
 			)
 			(pin power_out line
-				(at 7.62 1.27 180)
+				(at 10.16 1.27 180)
 				(length 2.54)
 				(name "OUT"
 					(effects
@@ -136,7 +136,7 @@
 				)
 			)
 			(pin power_in line
-				(at 0 -6.35 90)
+				(at -2.54 -7.62 90)
 				(length 2.54)
 				(name "GND"
 					(effects
@@ -153,9 +153,9 @@
 					)
 				)
 			)
-			(pin passive line
-				(at -2.54 -6.35 90)
-				(length 2.54) hide
+			(pin power_in line
+				(at 0 -7.62 90)
+				(length 2.54)
 				(name "GND"
 					(effects
 						(font
@@ -171,9 +171,9 @@
 					)
 				)
 			)
-			(pin passive line
-				(at 2.54 -6.35 90)
-				(length 2.54) hide
+			(pin power_in line
+				(at 2.54 -7.62 90)
+				(length 2.54)
 				(name "GND"
 					(effects
 						(font
@@ -189,9 +189,9 @@
 					)
 				)
 			)
-			(pin passive line
-				(at 3.81 -6.35 90)
-				(length 2.54) hide
+			(pin power_in line
+				(at 5.08 -7.62 90)
+				(length 2.54)
 				(name "GND"
 					(effects
 						(font
