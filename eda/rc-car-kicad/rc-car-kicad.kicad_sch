@@ -7062,75 +7062,6 @@
 		)
 	)
 	(symbol
-		(lib_id "Device:C")
-		(at 67.31 154.94 0)
-		(unit 1)
-		(exclude_from_sim no)
-		(in_bom yes)
-		(on_board yes)
-		(dnp no)
-		(uuid "0d6a41e7-a47c-4002-bda1-f41ed8c1122a")
-		(property "Reference" "C9"
-			(at 60.198 153.67 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Value" ".1uF"
-			(at 60.198 156.21 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify left)
-			)
-		)
-		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
-			(at 68.2752 158.75 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Datasheet" "~"
-			(at 67.31 154.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(property "Description" "Unpolarized capacitor"
-			(at 67.31 154.94 0)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(hide yes)
-			)
-		)
-		(pin "2"
-			(uuid "ce6596b6-2b29-4f71-8bad-40069e494700")
-		)
-		(pin "1"
-			(uuid "e645e8fd-55fe-4de9-aff5-f0785b795107")
-		)
-		(instances
-			(project "rc-car-kicad"
-				(path "/8c74a705-6515-4bfe-a511-932ab8fcaec8"
-					(reference "C9")
-					(unit 1)
-				)
-			)
-		)
-	)
-	(symbol
 		(lib_id "Device:C_Polarized")
 		(at 49.53 52.07 0)
 		(unit 1)
@@ -10979,6 +10910,75 @@
 			(project "rc-car-kicad"
 				(path "/8c74a705-6515-4bfe-a511-932ab8fcaec8"
 					(reference "R1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:C")
+		(at 67.31 154.94 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "b2b8017f-d14e-4ef5-ae42-58ab2ea9220c")
+		(property "Reference" "C9"
+			(at 60.198 153.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" ".1uF"
+			(at 60.198 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "Capacitor_SMD:C_0603_1608Metric_Pad1.08x0.95mm_HandSolder"
+			(at 68.2752 158.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 67.31 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Unpolarized capacitor"
+			(at 67.31 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "2"
+			(uuid "bf197af7-e17b-4ed7-8c57-324031a30b22")
+		)
+		(pin "1"
+			(uuid "3110d1f5-ac15-42a6-ad74-7016eea1bcf4")
+		)
+		(instances
+			(project "rc-car-kicad"
+				(path "/8c74a705-6515-4bfe-a511-932ab8fcaec8"
+					(reference "C9")
 					(unit 1)
 				)
 			)
