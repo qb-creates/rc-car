@@ -7,7 +7,7 @@
 	(title_block
 		(title "RC Car Controller")
 		(date "2025-09-09")
-		(rev "A")
+		(rev "A1")
 	)
 	(lib_symbols
 		(symbol "Connector_Generic:Conn_01x01"
@@ -11280,7 +11280,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "ade847c7-3bdf-462f-94c5-0f2a8df7a19e")
-		(property "Reference" "M-"
+		(property "Reference" "M-1"
 			(at 328.676 73.66 0)
 			(effects
 				(font
@@ -11331,7 +11331,7 @@
 		(instances
 			(project "rc-car-kicad"
 				(path "/8c74a705-6515-4bfe-a511-932ab8fcaec8"
-					(reference "M-")
+					(reference "M-1")
 					(unit 1)
 				)
 			)
@@ -11905,7 +11905,7 @@
 		(on_board yes)
 		(dnp no)
 		(uuid "c21820ff-31a2-4c5e-a592-653b8feef449")
-		(property "Reference" "M+"
+		(property "Reference" "M+1"
 			(at 314.96 73.406 0)
 			(effects
 				(font
@@ -11956,7 +11956,7 @@
 		(instances
 			(project "rc-car-kicad"
 				(path "/8c74a705-6515-4bfe-a511-932ab8fcaec8"
-					(reference "M+")
+					(reference "M+1")
 					(unit 1)
 				)
 			)
