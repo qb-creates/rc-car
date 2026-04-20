@@ -1,5 +1,16 @@
+
+/**
+ * @file joystick.cpp
+ * @brief Provides functions to initialize and read analog joystick values for speed and steering.
+ *
+ * Contains ADC initialization and reading, as well as mapping joystick positions to speed and steering values.
+ */
+
 #include "joystick.h"
 
+/**
+ * @brief Initializes the ADC hardware for joystick input.
+ */
 void initializeJoysticks(void)
 {
     // Set ADC reference to AVCC (5V) and select ADC0 (PA0)
@@ -15,6 +26,11 @@ void initializeJoysticks(void)
         ;
 }
 
+/**
+ * @brief Reads a value from the specified ADC channel (0-7).
+ * @param channel The ADC channel to read.
+ * @return 10-bit ADC value (0-1023).
+ */
 uint16_t readADC(uint8_t channel)
 {
     // Select ADC channel (0-7 for ATmega1284)
@@ -31,14 +47,13 @@ uint16_t readADC(uint8_t channel)
     return ADC;
 }
 
+/**
+ * @brief Reads and maps the speed joystick value to a signed speed output.
+ *        Inverts and scales the ADC value to a range centered around zero.
+ * @return Signed speed value.
+ */
 int16_t readSpeedJoystick(void)
 {
-    // Max is 60
-    // int16_t speedValue = readADC(1);
-    // speedValue = 1023 - speedValue;
-    // speedValue = speedValue / 8.525;
-    // speedValue = speedValue - 60;
-
     int16_t speedValue = readADC(1);
     speedValue = 1023 - speedValue;
     speedValue = speedValue / 10.23;
@@ -46,15 +61,16 @@ int16_t readSpeedJoystick(void)
     return speedValue;
 }
 
+/**
+ * @brief Reads and maps the steering joystick value to a PWM-compatible range.
+ *        Inverts and scales the ADC value to fit servo or motor controller input.
+ * @return Steering value (typically 1200-1700).
+ */
 uint16_t readSteeringJoystick(void)
 {
-    // Max is set to 1900. Min is 1000. Middle is 1450
-    uint16_t steeringValue = readADC(0);
-    steeringValue = 1023 - steeringValue;
-
-    // Divide by 1.27875 to get 800 and add 1000. Makes the min to max 1000 to 1800
-    steeringValue = (steeringValue / 1.27875) + 1000;
-    steeringValue = steeringValue <= 1100 ? 1100 : steeringValue;
-
+    // Linear mapping: ADC 0 -> 1200, ADC 1023 -> 1700
+    uint16_t adcValue = readADC(0);
+    adcValue = 1023 - adcValue; // Invert if needed for joystick direction
+    uint16_t steeringValue = ((uint32_t)adcValue * 500) / 1023 + 1200;
     return steeringValue;
 }

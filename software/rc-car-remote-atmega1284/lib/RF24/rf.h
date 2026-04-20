@@ -11,6 +11,5 @@ struct MotorControlPayload
 
 void rfConfigureRadio(void);
 void rfTransmitData(MotorControlPayload data);
-void printRF24Status(void);
 
 #endif
