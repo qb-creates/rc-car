@@ -1,0 +1,5 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "rc-car-remote") (type "KiCad") (uri "${KIPRJMOD}/rc-car-remote.pretty") (options "") (descr ""))
+	(lib (name "rc-car-remote") (type "KiCad") (uri "${KIPRJMOD}/rc-car-remote.pretty") (options "") (descr ""))
+)
