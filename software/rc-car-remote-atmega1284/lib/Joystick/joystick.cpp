@@ -56,21 +56,27 @@ int16_t readSpeedJoystick(void)
 {
     int16_t speedValue = readADC(1);
     speedValue = 1023 - speedValue;
-    speedValue = speedValue / 10.23;
-    speedValue = speedValue - 50;
+    speedValue = speedValue / 2.6921052;
+    speedValue = speedValue - 190;
     return speedValue;
 }
 
 /**
  * @brief Reads and maps the steering joystick value to a PWM-compatible range.
  *        Inverts and scales the ADC value to fit servo or motor controller input.
- * @return Steering value (typically 1200-1700).
+ * @return Steering value in the range 1400-2000 (center ~1675).
  */
 uint16_t readSteeringJoystick(void)
 {
-    // Linear mapping: ADC 0 -> 1200, ADC 1023 -> 1700
+    // Piecewise mapping: ADC 0 -> 1400, ADC ~511/512 -> 1675, ADC 1023 -> 2000
     uint16_t adcValue = readADC(0);
     adcValue = 1023 - adcValue; // Invert if needed for joystick direction
-    uint16_t steeringValue = ((uint32_t)adcValue * 500) / 1023 + 1200;
-    return steeringValue;
+
+    // Map 0-511 to 1400-1675.
+    if (adcValue <= 511) {
+        return ((uint32_t)adcValue * 275) / 511 + 1400;
+    }
+
+    // Map 512-1023 to 1675-2000.
+    return ((uint32_t)(adcValue - 512) * 325) / 511 + 1675;
 }

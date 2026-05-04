@@ -18,7 +18,8 @@ RF24 radio(CE_PIN, CSN_PIN);
  *
  * Two 6-byte addresses: "1Node" and "2Node"
  */
-uint8_t address[][6] = {"1Node", "2Node"};
+// uint8_t address[][6] = {"1Node", "2Node"};
+uint8_t address[][6] = {"bmw-1", "bmw-2"};
 
 /**
  * @brief Radio node identifier

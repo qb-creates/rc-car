@@ -19,8 +19,6 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
     - [RF Transmitter ](#rftransmitter)
     - [Parts List](#remotepartslist) 
 4. [Hardware Design](#hardware-design)
-5. [Electronics & PCB](#electronics--pcb)
-6. [Software](#software)
 7. [Gallery](#gallery)
 
 ## 1. Software Used<a name="software"></a>
@@ -28,16 +26,6 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 - AVRDUDE (Flash Uploader): https://github.com/avrdudes/avrdude
 - KiCad (PCB Design): https://www.kicad.org
 - AutoDesk Fusion 360 Personal (Case Design): https://www.autodesk.com/products/fusion-360/personal
-
-## 3. Remote Control Circuit<a name="remotecontrolcircuit"></a>
-
-### Control Input Processing<a name="controlciruitprocessing"></a>
-#### Throttle Input (Left Analog Stick)<a name="throttleprocessing"></a>
-#### Steering Input (Right Analog Stick)<a name="steeringprocessing"></a>
-
-### RF Transmitter<a name="rftransmitter"></a>
-
-### Parts List<a name="remotepartslist"></a>
 
 ## 2. Car Control Circuit<a name="carcontrolcuit"></a>
 
@@ -67,6 +55,15 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 |<a href="https://www.amazon.com/Adapter-Regulated-Switching-Interchangeable-Equipment/dp/B0BFPXZ7S1/ref=sr_1_3_sspa?crid=396GU23EXCZA8&keywords=9v+power+supply&qid=1697854150&sprefix=9v+power%2Caps%2C93&sr=8-3-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1">9V 1A Power Supply</a>| x1 |
 |<a href="https://www.adafruit.com/product/1407">5V 200mA Inductive Charging Set </a>| x1 |
 
+## 3. Remote Control Circuit<a name="remotecontrolcircuit"></a>
+
+### Control Input Processing<a name="controlciruitprocessing"></a>
+#### Throttle Input (Left Analog Stick)<a name="throttleprocessing"></a>
+#### Steering Input (Right Analog Stick)<a name="steeringprocessing"></a>
+
+### RF Transmitter<a name="rftransmitter"></a>
+
+### Parts List<a name="remotepartslist"></a>
 
 ## Hardware Design
 All hardware was designed in KiCad and fabricated for this project. The main board controls the car's motors and steering, while a separate remote board reads joystick inputs and transmits commands wirelessly.
@@ -81,63 +78,6 @@ Schematic and PCB files are available in the `eda/rc-car-kicad/` directory. Exam
 - `rc-car-kicad.kicad_sch` – Main schematic
 - `rc-car-kicad.kicad_pcb` – Main PCB layout
 - `rc-car-panel.kicad_pcb` – Panelized PCB for manufacturing
-
----
-
-## Electronics & PCB
-The electronics are split into two main systems:
-
-### Car Controller
-- Reads RF commands and controls the drive motor and steering servo
-- PWM for motor speed and steering angle
-- USART for debugging
-
-### Remote Controller
-- Reads analog joystick for speed and steering
-- Packages data and transmits via NRF24L01
-
-#### Example: Motor and Steering Control (Car)
-```cpp
-// src/main.cpp (car)
-configureMotorPWM();
-configureSteeringPWM();
-while (true) {
-	readAndPrintRFData(&payload);
-	OCR1B = payload.ocrSteering;
-	if (payload.ocrMotor >= -15 && payload.ocrMotor <= 15) {
-		stopMotor();
-	}
-	// ...
-}
-```
-
-#### Example: Joystick Reading & RF Transmission (Remote)
-```cpp
-// src/main.cpp (remote)
-int16_t speedValue = readSpeedJoystick();
-uint16_t steeringValue = readSteeringJoystick();
-payload.ocrMotor = speedValue;
-payload.ocrSteering = steeringValue;
-rfTransmitData(payload);
-```
-
----
-
-## Software
-The firmware is organized into two PlatformIO projects:
-
-- `software/rc-car-atmega1284/` – Car controller code
-- `software/rc-car-remote-atmega1284/` – Remote controller code
-
-Each project uses modular libraries for:
-- Motor and steering PWM control
-- RF24 radio communication
-- Joystick input (remote)
-- USART serial output
-
-See the `src/` and `lib/` folders in each project for implementation details.
-
----
 
 ## Gallery
 <div align="center">

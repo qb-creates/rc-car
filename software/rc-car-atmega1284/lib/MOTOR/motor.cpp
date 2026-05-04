@@ -42,7 +42,7 @@ void configureMotorPWM(void)
     PORTC = 0;
     DDRC = (1 << PD0) | (1 << PD1) | (1 << PD2) | (1 << PD3);
 
-    // Enable PWM with a frequency of 20khz. OC2A and OC2B are disabled.
+    // Enable PWM with a frequency of 5khz. OC2A and OC2B are disabled.
     TCCR2A = (1 << WGM21) | (1 << WGM20);
     TCCR2B = (1 << WGM22);
     TIMSK2 = _BV(OCIE2B) | _BV(OCIE2A);
