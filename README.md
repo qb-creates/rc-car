@@ -11,6 +11,7 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
     - [Steering Server Control](#steering)
     - [Drive Motor Control](#drivemotor)
     - [RF Receiver ](#rfreceiver)
+    - [Power Consumption](#powerconsumption)
     - [Parts List](#carpartslist) 
 3. [Remote Control Circuit](#remotecontrolcircuit)
     - [Control Input Processing](#controlciruitprocessing)
@@ -18,7 +19,9 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
         - [Steering Input (Right Analog Stick)](#steeringprocessing)
     - [RF Transmitter ](#rftransmitter)
     - [Parts List](#remotepartslist) 
-4. [Hardware Design](#hardware-design)
+4. [Schematics](#schematics)
+    - [ESC Driver Schematic](#escschematic)
+    - [Clock Schematic](#clockschematic)
 7. [Gallery](#gallery)
 
 ## 1. Software Used<a name="software"></a>
@@ -35,6 +38,8 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 
 ### RF Receiver<a name="rfreceiver"></a>
 
+### Power Consumption<a name="powerconsumption"></a>
+---
 ### Parts List<a name="carpartslist"></a>
 |_**Part Number**_|_**Quantity**_|
 |:-----|:--------:|
@@ -76,7 +81,7 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 #### Steering Input (Right Analog Stick)<a name="steeringprocessing"></a>
 
 ### RF Transmitter<a name="rftransmitter"></a>
-
+---
 ### Parts List<a name="remotepartslist"></a>
 |_**Part Number**_|_**Quantity**_|
 |:-----|:--------:|
@@ -107,13 +112,17 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 |<a href="https://www.amazon.com/ruthex-Threaded-Insert-pieces-ultrasound/dp/B088QJG676/ref=sr_1_3?crid=327WC4A3U357H&dib=eyJ2IjoiMSJ9.v_Af1Sv2DMXyynp1rO3uN2cjI_LkHpW2Xd3NuL9RUn1yz2Ym6BTHo47Bnvh-mF3rih3MIxPZyDCFRwN3f8bgTgfOqS-2FD8o-WWmIpuq7XJIrvCSKP6iwhtXO1FB6g2J8vFhgMjuaMVbjKPUpn3U8iuk4FPTnzt9IQcKtjUuxKiJM3PQJf3MPDf15V62fIp3_oibwlJtUKJ7oyWbckn9BPgwhhw0z9gTb7ylLCQjULA.KUBGIt58ag9IJXW2aWAnvHSlQ59y6f_kavaLpQD422E&dib_tag=se&keywords=inserts%2Bm2&qid=1778806075&sprefix=inserts%2Bm%2Caps%2C197&sr=8-3&th=1">M2 Inserts</a>| x10 |
 |<a href="https://www.amazon.com/Phillips-Countersunk-Electronic-Accessories-Samsung/dp/B07HC3LQYS/ref=sr_1_8?crid=2ISFEC45EBS5Q&dib=eyJ2IjoiMSJ9.sToeJ_cHiwrPYQ_C9rq2gwq_BqFxCk_dAqNz8qbKlTKQla66SuHvAVoMEMQE3FrKbT_cXuKk3EDQL7eTiH6WYWt4xdVsIXdoV99uXBCs7qfK_HdB1wotMUmIz4MZM-fYqvCkvNTV6tpBtMOlWfMOOT3xG69H9dmbPd9TCbIKidT_fAgNMZEY2BR0qPmHW3JfhP0KSYKgUQ9dyiHrulr41WxGtIHFVkrdDqeaHCOoUuo.r_V_du0eyowAqg1oQ__QllHDwAeUxV1av7Z4HFjVBKw&dib_tag=se&keywords=m2%2Bscrews&qid=1778806119&sprefix=m2%2Bscrew%2Caps%2C149&sr=8-8&th=1">M2 Screws</a>| x10 |
 
-## Hardware Design
-All hardware was designed in KiCad and fabricated for this project. The main board controls the car's motors and steering, while a separate remote board reads joystick inputs and transmits commands wirelessly.
+## 4. Schematics <a name="schematics"></a>
+### Car Schematic<a name="escschematic"></a>
+<div>
+    <!-- <img src = "images/esc-driver-circuit-schematic.JPG"> -->
+</div>
 
-- **Main Board:** Controls DC motor (drive) and servo (steering)
-- **Remote Board:** Reads joystick positions and sends commands via RF
-- **Microcontroller:** ATmega1284 for both car and remote
-- **Wireless:** NRF24L01+ modules for robust 2.4GHz communication
+---
+### Car Remote Schematic<a name="clockschematic"></a>
+<div>
+    <!-- <img src = "images/led-circuit-schematic.jpg"> -->
+</div>
 
 ### Schematics & PCB
 Schematic and PCB files are available in the `eda/rc-car-kicad/` directory. Example files:
