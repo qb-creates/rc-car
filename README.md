@@ -22,7 +22,9 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 4. [Schematics](#schematics)
     - [ESC Driver Schematic](#escschematic)
     - [Clock Schematic](#clockschematic)
-7. [Gallery](#gallery)
+6. [STL Viewer](#stlviewer)
+    - [Case Base](#casebase)
+    - [Case Top](#casetop)
 
 ## 1. Software Used<a name="software"></a>
 - VSCode with PlatformIO extension: https://docs.platformio.org/en/latest/what-is-platformio.html
@@ -123,6 +125,11 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 <div>
     <!-- <img src = "images/led-circuit-schematic.jpg"> -->
 </div>
+
+## 6. STL Viewer <a name="stlviewer"></a>
+### Car Parts <a name="casebase"></a>
+
+### Remote Control <a name="casebase"></a>
 
 ### Schematics & PCB
 Schematic and PCB files are available in the `eda/rc-car-kicad/` directory. Example files:
