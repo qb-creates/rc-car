@@ -13,8 +13,8 @@
 #define CSN_PIN 1
 
 RF24 radio(CE_PIN, CSN_PIN);
-// uint8_t address[][6] = {"1Node", "2Node"};
-uint8_t address[][6] = {"bmw-1", "bmw-2"};
+uint8_t address[][6] = {"jag-1", "jag-2"};
+// uint8_t address[][6] = {"bmw-1", "bmw-2"};
 bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 /**

@@ -65,8 +65,8 @@ void configureSteeringPWM(void)
     // Set TOP value for 50 Hz
     ICR1 = 20000;
 
-    // Set pulse width for neutral servo position (~1.5 ms)
-    OCR1B = 1450;
+    // Set pulse width for neutral servo position to match transmitter center
+    OCR1B = 1780;
 }
 
 void stopMotor(void)

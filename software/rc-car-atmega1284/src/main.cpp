@@ -12,7 +12,7 @@
 #include <string.h>
 #include <util/delay.h>
 
-MotorControlPayload payload = {0, 1450};
+MotorControlPayload payload = {0, 1780};
 
 int main(void)
 {
