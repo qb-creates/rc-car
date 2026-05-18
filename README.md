@@ -47,8 +47,53 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 </div>
 
 ### Steering Servo Control<a name="steering"></a>
+Steering is driven by an SG90 servo using Timer1 hardware PWM on OC1B (PD4). The car firmware configures Timer1 in Fast PWM mode 14 with ICR1 as TOP, prescaler = 8, and ICR1 = 20000. With an 8 MHz clock, that gives a 1 us timer tick and about a 50 Hz control period (20 ms), which matches standard hobby servo timing.
+
+The commanded steering pulse is written directly to OCR1B. In this project, steering values are transmitted as absolute pulse widths in microseconds, centered at 1780 us. On the controller side, joystick input is mapped and clamped to approximately 1400 us to 2160 us (with a center trim offset), then sent over RF. On the car side, OCR1B is updated from the payload each loop:
+
+- Neutral: ~1780 us
+- Left/Right command range: ~1400 us to ~2160 us
+- PWM period: ~20 ms (50 Hz)
+
+This keeps steering response deterministic because the servo waveform is generated in hardware (Timer1), not by software toggling.
 
 ### Drive Motor Control<a name="drivemotor"></a>
+The drive motor uses a discrete H-bridge driven by a hybrid approach: latch lines select direction, while PWM is generated in software via Timer2 interrupts.
+
+H-bridge signal assignment:
+
+- PC0: Forward latch
+- PC1: Forward PWM
+- PC2: Reverse latch
+- PC3: Reverse PWM
+
+Timer2 is configured for Fast PWM with OCR2A as TOP. With OCR2A = 199 and prescaler = 8 at 8 MHz, PWM frequency is about 5 kHz. Instead of using OC2A/OC2B output pins directly, compare interrupts are used:
+
+- TIMER2_COMPA_vect sets the active direction PWM pin high (PC1 for forward or PC3 for reverse)
+- TIMER2_COMPB_vect clears that same active pin low
+
+This effectively creates direction-dependent PWM on one of two output pins while the opposite side remains off.
+
+Direction changes are intentionally staged to protect the bridge and drivetrain:
+
+1. Disable Timer2 PWM (stop switching)
+2. Force all H-bridge outputs low
+3. Wait 150 ms dead-time
+4. Assert new direction latch (PC0 forward or PC2 reverse)
+5. Re-enable Timer2 PWM
+
+That delay prevents hard instant reversals and reduces shoot-through/braking stress during forward/reverse transitions.
+
+Additional control logic from the car firmware:
+
+- Speed deadband: commands between -15 and +15 stop the motor to avoid joystick/noise creep
+- Direction is only changed when needed (or from stopped state)
+- A watchdog is enabled after first RF packet and reset on each valid packet; if RF traffic is lost, the MCU resets after the watchdog timeout (2 s)
+
+### Why RF reception is harder with this PWM approach
+Using Timer2 compare interrupts for every PWM cycle means the MCU is servicing frequent interrupts continuously while also polling and reading nRF24 payloads over SPI. That interrupt load can steal time from RF handling and make robust payload reception harder than a pure hardware-PWM motor path.
+
+In practice, the current tuning (about 5 kHz PWM, deadband around zero, staged direction changes) was a workable sweet spot between motor smoothness and reliable radio updates. A strictly hardware PWM implementation for both drive channels would reduce ISR overhead and leave more CPU time for RF processing.
 
 ### RF Receiver<a name="rfreceiver"></a>
 
