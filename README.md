@@ -7,22 +7,22 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 
 ## Table of Contents
 1. [Software Used](#software)
-2. [ Car Control Circuit](#carcontrolcuit)
-    - [Steering Server Control](#steering)
+2. [Drive and Steering Control Circuit](#driveandsteeringcircuit)
+    - [Steering Servo Control](#steering)
     - [Drive Motor Control](#drivemotor)
-    - [RF Receiver ](#rfreceiver)
+    - [RF Receiver](#rfreceiver)
     - [Power Consumption](#powerconsumption)
-    - [Parts List](#carpartslist) 
+    - [Parts List](#carpartslist)
 3. [Remote Control Circuit](#remotecontrolcircuit)
-    - [Control Input Processing](#controlciruitprocessing)
+    - [Control Input Processing](#controlinputprocessing)
         - [Throttle Input (Left Analog Stick)](#throttleprocessing)
         - [Steering Input (Right Analog Stick)](#steeringprocessing)
-    - [RF Transmitter ](#rftransmitter)
-    - [Parts List](#remotepartslist) 
+    - [RF Transmitter](#rftransmitter)
+    - [Parts List](#remotepartslist)
 4. [Schematics](#schematics)
-    - [ESC Driver Schematic](#escschematic)
-    - [Clock Schematic](#clockschematic)
-6. [STL Viewer](#stlviewer)
+    - [Drive and Steering System Schematic](#driveschematic)
+    - [Controller Schematic](#controllerschematic)
+5. [STL Viewer](#stlviewer)
     - [Case Base](#casebase)
     - [Case Top](#casetop)
 
@@ -30,9 +30,9 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 - VSCode with PlatformIO extension: https://docs.platformio.org/en/latest/what-is-platformio.html
 - AVRDUDE (Flash Uploader): https://github.com/avrdudes/avrdude
 - KiCad (PCB Design): https://www.kicad.org
-- AutoDesk Fusion 360 Personal (Case Design): https://www.autodesk.com/products/fusion-360/personal
+- Tinkercad (Controller and parts Design): https://www.tinkercad.com/
 
-## 2. Car Control Circuit<a name="carcontrolcuit"></a>
+## 2. Car Control Circuit<a name="driveandsteeringcircuit"></a>
 
 ### Steering Servo Control<a name="steering"></a>
 
@@ -70,6 +70,7 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 |<a href="https://www.digikey.com/en/products/detail/microchip-technology/ATMEGA164A-AU/2271202">ATmega164A-A</a>| x1 |
 |<a href="https://www.amazon.com/Micro-Servos-Helicopter-Airplane-Controls/dp/B07MLR1498/ref=sr_1_6?crid=2U7YPHQQPWA72&dib=eyJ2IjoiMSJ9.DO_8huDXG-WCdEl_xxmMGOc4m-SOLZHCxXbtX_tdiH3QEGU5P18WICxQSL6xcYWhQqOPLEHUu9sa71Q64UcwL7neHYD6CUQnu9wvT2wwK4ZGkDFNOfYnxbijpqOdZKKxCmOtE4j3XZz6xOX_f63TSt9JLIiMxN3DG0seC5RyzpEwr_yxKqqjQwaiqKzfF0LLlJ5IEMt1Yvu7OU-pBllXw2NXHtA4Nk9yhzDBZ44nW3KEf250HyQT_alUX4nBnvgKgZQTpK2CvP6yfaxlUb5at3ONkOKPIqikAtiE-KERbLM._KaHWO6YfP1st1Ba5PZS305amc16ENFTPJT_9hZmXpg&dib_tag=se&keywords=sg90%2Bservo&qid=1776825044&sprefix=sg90%2Caps%2C143&sr=8-6&th=1">SG90 servo motor</a>| x1 |
 |<a href="https://www.amazon.com/uxcell-Micro-11500-12000RPM-Remote-Control/dp/B07M99JK6Y/ref=sr_1_6_pp?crid=15ZR5I0IA9JJI&dib=eyJ2IjoiMSJ9.0dTLxilAb6xq-6TUjWUHu4LHY67tPVw3OW_p63iFn0nxHTF8tJOEU3O_Cb8oOwE6WxJZW0BjBXIf0G8GfpGx34Xib0qnggH2QTWBRLxwTrt1dVHrFBr4m3qlymM1dp_HGhddBT5o2u24L-f4An4mHsWxuHhcwAWkuWetTyXovK-j6vw5tc8bw8An9Jwehol9gVoWqmTKBzJJhRpDE5yd1FT2j8fYInDLiEd9pn63in9N35NYOYHjUvUYXkuJJkr2DH7aythkyAL53UUCrgou9nhxGCkFBAQQLPBe2CI7QtI.hByQYkM03NWvQAiFiiVJo0fbgudInFzwV0ohKh8QIlI&dib_tag=se&keywords=9v+motor&qid=1778356523&sprefix=9v+motor%2Caps%2C163&sr=8-6">9V DC Motor</a>| x1 |
+|<a href="https://www.amazon.com/KiNSMART-Jaguar-Project-Metal-Model/dp/B0GXDP3B83/ref=sr_1_2?crid=HY25IPNV0BHN&dib=eyJ2IjoiMSJ9.kNHmPeKKto7l4mN5kOvqBU7R0Xlsnn2LHCeKZya09DTJalbcDjd4JoTcYEG4oBi7Ljllb7X6_TGZSaIGPy1Xm1sebzbI1yp2mHZeyxYMDKpjf4Jqk94GJpw4gnU1N_5tkqw1yrXIqMnX5ZyADOEFBC7UcSktNJJQAYE5tSmkBo9atjGda3yxCk-vgOEnLoZFFx2acgDjpZFOOCdXU92NyMzapczCn7FhwygMaJ_Cei5oG747OONrkMHwEvzIolQ_2xz7kVeILcwJkr2IywmRw9VX98jR5jMxBVIL_H83mhw.naunVJhW78f1ztCTSTYnX7RhDgAuPRFgKA2PJmHRRKo&dib_tag=se&keywords=kinsmart%2B1%3A38&qid=1779063547&sprefix=kinsmart%2B1%2B38%2Caps%2C216&sr=8-2&th=1">Kinsmart Jaguar 1:38</a>| x1 |
 |<a href="https://www.amazon.com/HiLetgo-NRF24L01-Wireless-Transceiver-Module/dp/B00LX47OCY/ref=sr_1_1_sspa?crid=1USO9UOFDEZL5&dib=eyJ2IjoiMSJ9.HpGu4TebgrLEY6IjfmGnCKONGE1zifAy342llWfR4vcsJ4_OTj71wcfjuLFi42g9LnfOsZybnBvz4HCtPFZh7IoO0VCtoV4SHTwJkmzj3SyTmBWTWfYEwK0bZ-6KAhnJqpXuroU3ExNMIQ_0sb6zAw01BAymwhYK7jVncUvl8YxZV7HAVItE-ISceLL5caDSPRu-nl4dzw8eF-t1VvKSdHE_Pz68YolGVn5D4_TDIAE.6OIyGVxp3k88Grsb6QKkfbgzYiEAVdqjkrvRE4yyM6M&dib_tag=se&keywords=nrf24l01&qid=1778356552&sprefix=nrf%2Caps%2C232&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1">NRF24L01+ Module</a>| x1 |
 |<a href="https://www.amazon.com/dp/B07MW2L96L?ref=ppx_yo2ov_dt_b_fed_asin_title">7.4V battery</a>| x1 |
 |<a href="https://www.amazon.com/200PCS-Module-Plastic-Single-Spindle/dp/B0DKHG96PL/ref=sr_1_6?crid=W0RZLTTF36ZV&dib=eyJ2IjoiMSJ9.rd3Q4coQN-xK_iVME0RsSWQTjAsKta_V4h4vm12weDUJC74fnjatzucJO07yHtkLeIzfxeMC2dxmPiht58xboKdyTAKydnddtAAmDD_aARQfSeJf72BiNVGOLvJEh9z4o6wPQQIsW7IFXJZAsVFzRvb3aBc2lONKzi84gw8UxRRc2rQ9rWUQvz_yelBZoDNSvcFoSqvusfdJFjuKQ47WFcnAPOwQnc2LdEzRRlFGYalz5QPsVB-hWhAqh67OA6riZCc13JSazX8bvwV50yC13BdBVPq8QEGZLQo3CGB_GXM.rLefd6TJ3JQPyoYEO4myNas1mQIUsuXzyBHIw13Vpyw&dib_tag=se&keywords=dc%2Bmotor%2Bgears&qid=1778804461&sprefix=dc%2Bmotor%2Bgear%2Caps%2C142&sr=8-6&th=1">Gears </a>| x1 |
@@ -78,7 +79,7 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 
 ## 3. Remote Control Circuit<a name="remotecontrolcircuit"></a>
 
-### Control Input Processing<a name="controlciruitprocessing"></a>
+### Control Input Processing<a name="controlinputprocessing"></a>
 #### Throttle Input (Left Analog Stick)<a name="throttleprocessing"></a>
 #### Steering Input (Right Analog Stick)<a name="steeringprocessing"></a>
 
@@ -110,20 +111,20 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 |<a href="https://www.digikey.com/en/products/detail/microchip-technology/MIC5225-3-3YM5-TR/1815447">MIC5225-3.3YM5 Voltage Regulator</a>| x1 |
 |<a href="https://www.digikey.com/en/products/detail/microchip-technology/ATMEGA164A-AU/2271202">ATmega164A-A</a>| x1 |
 |<a href="https://www.amazon.com/HiLetgo-NRF24L01-Wireless-Transceiver-Module/dp/B00LX47OCY/ref=sr_1_1_sspa?crid=1USO9UOFDEZL5&dib=eyJ2IjoiMSJ9.HpGu4TebgrLEY6IjfmGnCKONGE1zifAy342llWfR4vcsJ4_OTj71wcfjuLFi42g9LnfOsZybnBvz4HCtPFZh7IoO0VCtoV4SHTwJkmzj3SyTmBWTWfYEwK0bZ-6KAhnJqpXuroU3ExNMIQ_0sb6zAw01BAymwhYK7jVncUvl8YxZV7HAVItE-ISceLL5caDSPRu-nl4dzw8eF-t1VvKSdHE_Pz68YolGVn5D4_TDIAE.6OIyGVxp3k88Grsb6QKkfbgzYiEAVdqjkrvRE4yyM6M&dib_tag=se&keywords=nrf24l01&qid=1778356552&sprefix=nrf%2Caps%2C232&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1">NRF24L01+ Module</a>| x1 |
-|<a href="https://www.amazon.com/EEMB-Battery-Rechargeable-Lithium-Connector/dp/B08VRZTHDL/ref=sr_1_7?crid=1SAR6C5CZF4V3&dib=eyJ2IjoiMSJ9.408pBhlzdVeVmbo_poIsZIDLeAw7nGM7XyUqHWw5iRgtK0f_PlmBPq7iJAyO8rVgj9Ez__q32r595DmAW2GYEA_LsFrZ7UT6TmwDJduhZs6ls8qhcUIYnDPrvPa7YaU_KWasY8srdql7X9-CUlv2n7gAl9VKFvAqtTbfS1UNXh-rlyFNPUyvDFn9uTXq8eh4ApiJKZJyBlvnKwCIaHDMmlos3QWkS5EG4E_BEA3ljBX79pLkbjgzYe3fqGd132ayr6jprX9tbXnVk3iAcPEmxfcfvtkoL0D5XqONH7Nbcfw.IBxIBbgV9sICFdFHPmr-sTLj7J0oZT9qip_0A9NdbOY&dib_tag=se&keywords=lipo+battery+3.7+250ma&qid=1778358066&sprefix=lipo+batter+3.7+250ma%2Caps%2C139&sr=8-7">3.7v batter</a>| x1 |
+|<a href="https://www.amazon.com/EEMB-Rechargeable-Connector-Parrott-Polarity/dp/B0B7R8CS2C/ref=sr_1_9?crid=2PNJXHT8O2BD7&dib=eyJ2IjoiMSJ9.ytY0ATgoZUTp8fkKfIbFwxfJ-RPFGOh8Fljs3SALwOdc0E5um9MqwU3Nf561TyqW5eWp_bfODQRFYKAYV0HQlPTNrv5PexF4DVU2RbBdxKcuSmBcDQuw5ImA3T8MQCieUYtHxHjlPQKIey3tmjioRLIZljCtEmJfrXf2yw62FtfaherhM4QZP-lGmU_qZ4IiXu3H0jwThQ-BqoBcTMGELR8DD_BVenflcsgEmfo4edXbIZRGZtWTI9cXMjF2NkhywL7GquoxWDFoC_LZDs7lVysMe3o4p0KdNnO_wNiqgRM.z8oLo5uD7M9zWKGX-XX1qytnO6Q6kw132uBizXV_u2c&dib_tag=se&keywords=250ma+hour+lipo+battery&qid=1779063612&sprefix=250ma+hour+lipo+battery%2Caps%2C142&sr=8-9">3.7v batter</a>| x1 |
 |<a href="https://www.amazon.com/ruthex-Threaded-Insert-pieces-ultrasound/dp/B088QJG676/ref=sr_1_3?crid=327WC4A3U357H&dib=eyJ2IjoiMSJ9.v_Af1Sv2DMXyynp1rO3uN2cjI_LkHpW2Xd3NuL9RUn1yz2Ym6BTHo47Bnvh-mF3rih3MIxPZyDCFRwN3f8bgTgfOqS-2FD8o-WWmIpuq7XJIrvCSKP6iwhtXO1FB6g2J8vFhgMjuaMVbjKPUpn3U8iuk4FPTnzt9IQcKtjUuxKiJM3PQJf3MPDf15V62fIp3_oibwlJtUKJ7oyWbckn9BPgwhhw0z9gTb7ylLCQjULA.KUBGIt58ag9IJXW2aWAnvHSlQ59y6f_kavaLpQD422E&dib_tag=se&keywords=inserts%2Bm2&qid=1778806075&sprefix=inserts%2Bm%2Caps%2C197&sr=8-3&th=1">M2 Inserts</a>| x10 |
 |<a href="https://www.amazon.com/Phillips-Countersunk-Electronic-Accessories-Samsung/dp/B07HC3LQYS/ref=sr_1_8?crid=2ISFEC45EBS5Q&dib=eyJ2IjoiMSJ9.sToeJ_cHiwrPYQ_C9rq2gwq_BqFxCk_dAqNz8qbKlTKQla66SuHvAVoMEMQE3FrKbT_cXuKk3EDQL7eTiH6WYWt4xdVsIXdoV99uXBCs7qfK_HdB1wotMUmIz4MZM-fYqvCkvNTV6tpBtMOlWfMOOT3xG69H9dmbPd9TCbIKidT_fAgNMZEY2BR0qPmHW3JfhP0KSYKgUQ9dyiHrulr41WxGtIHFVkrdDqeaHCOoUuo.r_V_du0eyowAqg1oQ__QllHDwAeUxV1av7Z4HFjVBKw&dib_tag=se&keywords=m2%2Bscrews&qid=1778806119&sprefix=m2%2Bscrew%2Caps%2C149&sr=8-8&th=1">M2 Screws</a>| x10 |
 
 ## 4. Schematics <a name="schematics"></a>
 ### Car Schematic<a name="escschematic"></a>
 <div>
-    <!-- <img src = "images/esc-driver-circuit-schematic.JPG"> -->
+    <img src="images/drive-and-steering-circuit.JPG" width="700" alt="Drive and Steering Circuit">
 </div>
 
 ---
 ### Car Remote Schematic<a name="clockschematic"></a>
 <div>
-    <!-- <img src = "images/led-circuit-schematic.jpg"> -->
+    <img src="images/controller-circuit.JPG" width="700" alt="Controller Circuit">
 </div>
 
 ## 6. STL Viewer <a name="stlviewer"></a>

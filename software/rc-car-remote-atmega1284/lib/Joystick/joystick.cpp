@@ -63,7 +63,7 @@ uint16_t readADC(uint8_t channel)
  */
 int16_t readSpeedJoystick(void)
 {
-    int16_t speedValue = readADC(1);
+    int16_t speedValue = readADC(0);
     speedValue = 1023 - speedValue;
     speedValue = speedValue / 2.6921052;
     speedValue = speedValue - 190;
@@ -77,7 +77,7 @@ int16_t readSpeedJoystick(void)
  */
 uint16_t readSteeringJoystick(void)
 {
-    uint16_t adcValue = readADC(0);
+    uint16_t adcValue = readADC(1);
     adcValue = 1023 - adcValue;
 
     int16_t centerOffset = STEERING_CENTER_OFFSET;
