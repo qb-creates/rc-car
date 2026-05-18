@@ -2,7 +2,7 @@
 This project is a custom-built remote-controlled (RC) car, designed from the ground up with custom electronics, PCB design, and embedded software for both the car and its remote. The project demonstrates:
 
 <div align="center">
-	<img src="images/completed-car-side-profile.JPEG" width="500" alt="Completed RC Car Side Profile">
+	<img src="images/completed-car.JPEG" width="500" alt="Completed RC Car Side Profile">
 </div>
 
 ## Table of Contents
@@ -32,7 +32,19 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 - KiCad (PCB Design): https://www.kicad.org
 - Tinkercad (Controller and parts Design): https://www.tinkercad.com/
 
-## 2. Car Control Circuit<a name="driveandsteeringcircuit"></a>
+## 2. Drive and Steering Control Circuit<a name="driveandsteeringcircuit"></a>
+<div align="center">
+ <table>
+     <tr>
+         <td><img src="images/car-side-profile.JPEG" width="360" alt="Car Side Profile"></td>
+         <td><img src="images/car-top-profile.JPEG" width="360" alt="Car Top Profile"></td>
+     </tr>
+     <tr>
+         <td><img src="images/car-angled-profile.JPEG" width="360" alt="Car Angled Profile"></td>
+         <td><img src="images/car-side-profile-complete.JPEG" width="360" alt="Car Side Profile Complete"></td>
+     </tr>
+ </table>
+</div>
 
 ### Steering Servo Control<a name="steering"></a>
 
@@ -78,6 +90,18 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 |<a href="https://www.amazon.com/Phillips-Countersunk-Electronic-Accessories-Samsung/dp/B07HC3LQYS/ref=sr_1_8?crid=2ISFEC45EBS5Q&dib=eyJ2IjoiMSJ9.sToeJ_cHiwrPYQ_C9rq2gwq_BqFxCk_dAqNz8qbKlTKQla66SuHvAVoMEMQE3FrKbT_cXuKk3EDQL7eTiH6WYWt4xdVsIXdoV99uXBCs7qfK_HdB1wotMUmIz4MZM-fYqvCkvNTV6tpBtMOlWfMOOT3xG69H9dmbPd9TCbIKidT_fAgNMZEY2BR0qPmHW3JfhP0KSYKgUQ9dyiHrulr41WxGtIHFVkrdDqeaHCOoUuo.r_V_du0eyowAqg1oQ__QllHDwAeUxV1av7Z4HFjVBKw&dib_tag=se&keywords=m2%2Bscrews&qid=1778806119&sprefix=m2%2Bscrew%2Caps%2C149&sr=8-8&th=1">M2 screws</a>| x3 |
 
 ## 3. Remote Control Circuit<a name="remotecontrolcircuit"></a>
+<div align="center">
+ <table>
+     <tr>
+         <td><img src="images/radio-controller-front.JPEG" width="360" alt="Radio Controller Front"></td>
+         <td><img src="images/radio-controller-back.JPEG" width="360" alt="Radio Controller Back"></td>
+     </tr>
+     <tr>
+         <td><img src="images/radio-controller-mounted.JPEG" width="360" alt="Radio Controller Mounted"></td>
+         <td><img src="images/radio-controller-complete.JPEG" width="360" alt="Radio Controller Complete"></td>
+     </tr>
+ </table>
+</div>
 
 ### Control Input Processing<a name="controlinputprocessing"></a>
 #### Throttle Input (Left Analog Stick)<a name="throttleprocessing"></a>
@@ -137,16 +161,6 @@ Schematic and PCB files are available in the `eda/rc-car-kicad/` directory. Exam
 - `rc-car-kicad.kicad_sch` – Main schematic
 - `rc-car-kicad.kicad_pcb` – Main PCB layout
 - `rc-car-panel.kicad_pcb` – Panelized PCB for manufacturing
-
-## Gallery
-<div align="center">
-	<img src="images/car-components-side-profile.JPEG" width="350" alt="Car Components Side Profile">
-	<img src="images/front-pcb.PNG" width="350" alt="Front PCB">
-	<img src="images/full-board-pcb.PNG" width="350" alt="Full Board PCB">
-	<img src="images/microcontroller-brain.JPEG" width="350" alt="Microcontroller Brain">
-	<img src="images/power-delivery-board.JPEG" width="350" alt="Power Delivery Board">
-	<img src="images/steering-components.JPEG" width="350" alt="Steering Components">
-</div>
 
 ---
 
