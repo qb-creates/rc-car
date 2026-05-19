@@ -5,11 +5,12 @@
 
 struct MotorControlPayload
 {
-    int16_t ocrMotor;
+    int16_t ocrMotor; // only using 6 characters for TX & ACK payloads
     uint16_t ocrSteering;
 };
 
-void rfConfigureRadio(void);
-void rfTransmitData(MotorControlPayload data);
+void configureRFRadio(void);
+void readAndPrintRFData(MotorControlPayload *payload);
+void printRF24Status(void);
 
 #endif

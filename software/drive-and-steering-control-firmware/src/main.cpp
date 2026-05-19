@@ -1,4 +1,4 @@
-#include "joystick.h"
+#include "motor.h"
 #include "rf.h"
 #include "usart.h"
 #include <RF24.h>
@@ -7,31 +7,47 @@
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
+#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <util/delay.h>
 
+MotorControlPayload payload = {0, 1780};
+
 int main(void)
 {
-    // Set DDRC to be all inputs
-    DDRC = 0x00;
+    // Clear watchdog reset flag and disable watchdog timer.
+    MCUSR &= ~(1 << WDRF);
+    wdt_disable();
+    
+    DDRD = 0xFF;
+    PORTD |= _BV(PD5);
 
-    // Enable pull up resisotr for PC7.
-    PORTC = _BV(PC7);
-
+    sei();
+    configureMotorPWM();
+    configureSteeringPWM();
     enableUSART();
-    initializeJoysticks();
-    rfConfigureRadio();
-
-    MotorControlPayload payload = {1, 1450};
-
+    configureRFRadio();
+    
     while (true)
     {
-        int16_t speedValue = readSpeedJoystick();
-        uint16_t steeringValue = readSteeringJoystick();
+        readAndPrintRFData(&payload);
 
-        payload.ocrMotor = speedValue;
-        payload.ocrSteering = steeringValue;
-        rfTransmitData(payload);
-    }
+        OCR1B = payload.ocrSteering;
+
+        if (payload.ocrMotor >= -15 && payload.ocrMotor <= 15)
+        {
+            stopMotor();
+        }
+        else if (payload.ocrMotor < -15 && (!reverseMotor || motorStoped))
+        {
+            setMotorDirection(false);
+        }
+        else if (payload.ocrMotor > 15 && (reverseMotor || motorStoped))
+        {
+            setMotorDirection(true);
+        }
+
+        setMotorSpeed(payload.ocrMotor);
+    }    
 }

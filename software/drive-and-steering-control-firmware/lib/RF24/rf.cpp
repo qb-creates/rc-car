@@ -1,31 +1,41 @@
-
-/**
- * @file rf.cpp
- * @brief Handles configuration and data transmission for the nRF24L01+ RF module.
- *
- * Provides functions to initialize the RF module and transmit data payloads.
- */
-
 #include "rf.h"
 #include "usart.h"
+#include <avr/wdt.h>
 
+// nRF24L01+ Pin definitions for RF24 library
 #define CE_PIN 0
 #define CSN_PIN 1
 
+/**
+ * @brief RF24 radio object instance
+ *
+ * Configured for CE_PIN=0 (PB0) and CSN_PIN=1 (PB1)
+ */
 RF24 radio(CE_PIN, CSN_PIN);
-// uint8_t address[][6] = {"jag-1", "jag-2"};
-uint8_t address[][6] = {"bmw-1", "bmw-2"};
-bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 /**
- * @brief Configures the nRF24L01+ radio and sets up communication parameters.
- *        Initializes timer, sets addresses, and prepares the radio for TX/RX.
+ * @brief RF24 node addresses for bidirectional communication
+ *
+ * Two 6-byte addresses: "1Node" and "2Node"
  */
-void rfConfigureRadio(void)
+uint8_t address[][6] = {"jag-1", "jag-2"};
+// uint8_t address[][6] = {"bmw-1", "bmw-2"};
+
+/**
+ * @brief Radio node identifier
+ *
+ * - 0: Uses address[0] to transmit, receives on address[1]
+ * - 1: Uses address[1] to transmit, receives on address[0]
+ */
+bool radioNumber = 0;
+
+bool rfDataReceived = false;
+
+void configureRFRadio(void)
 {
-    // Initialize 1 millisecond timer on timer0
+    // Set up ms timmer for RF24 library
     TCCR0A = (1 << COM0B1) | (1 << WGM01) | (1 << WGM00);
-    TCCR0B = (1 << WGM02) | (1 << CS01);
+    TCCR0B = (1 << WGM02) | (1 << CS01); // Prescaler = 8
     OCR0A = 49;
 
     if (!radio.begin())
@@ -50,18 +60,92 @@ void rfConfigureRadio(void)
 
     // set the RX address of the TX node into a RX pipe
     radio.openReadingPipe(1, address[!radioNumber]); // using pipe 1
+
+    radio.startListening(); // put radio in RX mode
 }
 
-/**
- * @brief Transmits a MotorControlPayload struct over the RF link.
- * @param payload The data payload to transmit.
- */
-void rfTransmitData(MotorControlPayload payload)
+void readAndPrintRFData(MotorControlPayload *payload)
 {
-    bool report = radio.write(&payload, sizeof(payload));
+    uint8_t pipe;
+    // static int8_t currentMotor;
 
-    if (!report)
+    if (radio.available(&pipe))
     {
-        usartTransmit("Transmission failed or timed out\r\n", 35);
+        uint8_t payloadSize = radio.getDynamicPayloadSize();        
+        radio.read(payload, sizeof(*payload));     
+
+        if (!rfDataReceived)
+        {
+            rfDataReceived = true;
+            wdt_enable(WDTO_2S);
+        }
+        else
+        {
+            wdt_reset();
+        }
+    }
+}
+
+void printRF24Status(void)
+{
+    usartTransmit("RF24 Status:\r\n", 13);
+
+    // Test basic SPI communication first
+    usartTransmit("Testing basic SPI...\r\n", 22);
+
+    // Simple SPI test - try to read CONFIG register (0x00)
+    PORTB &= ~(1 << PB1); // CSN low (PB1)
+    SPDR = 0x00;          // Send read command for CONFIG register
+    while (!(SPSR & (1 << SPIF)))
+        ;
+    SPDR = 0xFF; // Send dummy byte
+    while (!(SPSR & (1 << SPIF)))
+        ;
+    uint8_t config_reg = SPDR;
+    PORTB |= (1 << PB1); // CSN high (PB1)
+
+    usartTransmit("CONFIG register: ", 17);
+    uart_send_uint8_as_ascii(config_reg);
+    usartTransmit("\r\n", 2);
+
+    if (radio.isChipConnected())
+    {
+        usartTransmit("- Chip: Connected\r\n", 18);
+    }
+    else
+    {
+        usartTransmit("- Chip: NOT Connected!\r\n", 24);
+    }
+
+    usartTransmit("- Channel: ", 11);
+    uart_send_uint8_as_ascii(radio.getChannel());
+    usartTransmit("\r\n", 2);
+
+    usartTransmit("- Data Rate: ", 13);
+    if (radio.getDataRate() == RF24_1MBPS)
+    {
+        usartTransmit("1Mbps\r\n", 7);
+    }
+    else if (radio.getDataRate() == RF24_2MBPS)
+    {
+        usartTransmit("2Mbps\r\n", 7);
+    }
+    else
+    {
+        usartTransmit("250kbps\r\n", 9);
+    }
+
+    usartTransmit("- Power Level: ", 15);
+    if (radio.getPALevel() == RF24_PA_LOW)
+    {
+        usartTransmit("LOW\r\n", 5);
+    }
+    else if (radio.getPALevel() == RF24_PA_HIGH)
+    {
+        usartTransmit("HIGH\r\n", 6);
+    }
+    else
+    {
+        usartTransmit("MAX\r\n", 5);
     }
 }
