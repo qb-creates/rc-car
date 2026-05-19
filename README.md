@@ -12,12 +12,14 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
     - [Steering Servo Control](#steering)
     - [Drive Motor Control](#drivemotor)
     - [Power Consumption](#powerconsumption)
+    - [Charging Notes](#carcharging)
     - [Parts List](#carpartslist)
 3. [Remote Control Circuit](#remotecontrolcircuit)
+    - [RF Transmitter](#rftransmitter)
     - [Control Input Processing](#controlinputprocessing)
         - [Throttle Input (Left Analog Stick)](#throttleprocessing)
         - [Steering Input (Right Analog Stick)](#steeringprocessing)
-    - [RF Transmitter](#rftransmitter)
+    - [Charging Notes](#remotecharging)
     - [Parts List](#remotepartslist)
 4. [Schematics](#schematics)
     - [Drive and Steering System Schematic](#driveschematic)
@@ -170,6 +172,9 @@ Power-stage device headroom:
 
 Conclusion: the battery and MOSFET current limits provide practical headroom over the expected peak load, so the system can supply drive, steering, and control electronics simultaneously under normal and transient operation.
 
+### Charging Notes<a name="carcharging"></a>
+For safe charging practice on the car side, do not charge the car while it is powered on. Turn the car off first, then connect the charger.
+
 ---
 ### Parts List<a name="carpartslist"></a>
 |_**Part Number**_|_**Quantity**_|
@@ -207,6 +212,8 @@ Conclusion: the battery and MOSFET current limits provide practical headroom ove
 |<a href="https://www.amazon.com/Phillips-Countersunk-Electronic-Accessories-Samsung/dp/B07HC3LQYS/ref=sr_1_8?crid=2ISFEC45EBS5Q&dib=eyJ2IjoiMSJ9.sToeJ_cHiwrPYQ_C9rq2gwq_BqFxCk_dAqNz8qbKlTKQla66SuHvAVoMEMQE3FrKbT_cXuKk3EDQL7eTiH6WYWt4xdVsIXdoV99uXBCs7qfK_HdB1wotMUmIz4MZM-fYqvCkvNTV6tpBtMOlWfMOOT3xG69H9dmbPd9TCbIKidT_fAgNMZEY2BR0qPmHW3JfhP0KSYKgUQ9dyiHrulr41WxGtIHFVkrdDqeaHCOoUuo.r_V_du0eyowAqg1oQ__QllHDwAeUxV1av7Z4HFjVBKw&dib_tag=se&keywords=m2%2Bscrews&qid=1778806119&sprefix=m2%2Bscrew%2Caps%2C149&sr=8-8&th=1">M2 screws</a>| x3 |
 
 ## 3. Remote Control Circuit<a name="remotecontrolcircuit"></a>
+The handheld controller samples two joystick axes, converts them into throttle and steering commands, and transmits those values over 2.4 GHz to the car at a steady update rate. The design goal is low-latency control with stable center behavior so the car tracks driver input without twitching or drift.
+
 <div align="center">
  <table>
      <tr>
@@ -220,11 +227,21 @@ Conclusion: the battery and MOSFET current limits provide practical headroom ove
  </table>
 </div>
 
-### Control Input Processing<a name="controlinputprocessing"></a>
-#### Throttle Input (Left Analog Stick)<a name="throttleprocessing"></a>
-#### Steering Input (Right Analog Stick)<a name="steeringprocessing"></a>
-
 ### RF Transmitter<a name="rftransmitter"></a>
+The remote uses an nRF24L01+ module with RF24 over SPI to transmit `MotorControlPayload` packets containing `ocrMotor` and `ocrSteering`. During initialization, firmware performs a radio hardware check, configures dynamic payload mode, and sets TX/RX addresses for the paired node. Timer0 is also configured with a 50 us base so the `millis()`/`micros()` timing used by RF24 remains stable while packets are sent continuously.
+
+### Control Input Processing<a name="controlinputprocessing"></a>
+Joystick values are read through the ADC and mapped into the exact command domains expected by the vehicle firmware. This preprocessing keeps control semantics consistent across the RF link: signed throttle around zero and steering in absolute pulse-width units centered at neutral.
+
+#### Throttle Input (Left Analog Stick)<a name="throttleprocessing"></a>
+Throttle is sampled on ADC channel 0, inverted to match intuitive stick direction, scaled into a signed drive command, and centered around zero. Positive values represent forward demand, negative values represent reverse demand, and near-zero commands cooperate with the car-side deadband to prevent idle creep.
+
+#### Steering Input (Right Analog Stick)<a name="steeringprocessing"></a>
+Steering is sampled on ADC channel 1, mapped around the 1900 us center point, and clamped to the valid steering window before transmission. A center deadzone is applied so small stick jitter and ADC noise snap back to neutral, reducing servo chatter and improving straight-line stability.
+
+### Charging Notes<a name="remotecharging"></a>
+The remote has a built-in LiPo charging circuit. When a charger is connected, the controller may automatically power on while charging. You can place the power switch in the OFF position before charging if you prefer it to stay off.
+
 ---
 ### Parts List<a name="remotepartslist"></a>
 |_**Part Number**_|_**Quantity**_|
