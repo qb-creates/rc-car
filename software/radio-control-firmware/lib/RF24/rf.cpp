@@ -13,8 +13,8 @@
 #define CSN_PIN 1
 
 RF24 radio(CE_PIN, CSN_PIN);
-// uint8_t address[][6] = {"jag-1", "jag-2"};
-uint8_t address[][6] = {"bmw-1", "bmw-2"};
+uint8_t address[][6] = {"jag-1", "jag-2"};
+// uint8_t address[][6] = {"bmw-1", "bmw-2"};
 bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to transmit
 
 /**
@@ -23,7 +23,8 @@ bool radioNumber = 1; // 0 uses address[0] to transmit, 1 uses address[1] to tra
  */
 void rfConfigureRadio(void)
 {
-    // Initialize 1 millisecond timer on timer0
+    // RF24 relies on millis()/micros() timing, so keep Timer0 running.
+    // At 8 MHz with prescaler 8 and OCR0A=49, Timer0 period is 50 us.
     TCCR0A = (1 << COM0B1) | (1 << WGM01) | (1 << WGM00);
     TCCR0B = (1 << WGM02) | (1 << CS01);
     OCR0A = 49;

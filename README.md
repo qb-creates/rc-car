@@ -8,9 +8,9 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 ## Table of Contents
 1. [Software Used](#software)
 2. [Drive and Steering Control Circuit](#driveandsteeringcircuit)
+    - [RF Receiver](#rfreceiver)
     - [Steering Servo Control](#steering)
     - [Drive Motor Control](#drivemotor)
-    - [RF Receiver](#rfreceiver)
     - [Power Consumption](#powerconsumption)
     - [Parts List](#carpartslist)
 3. [Remote Control Circuit](#remotecontrolcircuit)
@@ -33,6 +33,8 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
 - Tinkercad (Controller and parts Design): https://www.tinkercad.com/
 
 ## 2. Drive and Steering Control Circuit<a name="driveandsteeringcircuit"></a>
+This board is the car's real-time control core. It receives wireless throttle/steering commands from the handheld transmitter, converts steering targets into stable hardware PWM for the MG90S servo, and drives the rear motor through a protected H-bridge path with direction dead-time and command deadbands for smoother behavior. The result is a compact control system designed for responsive handling, predictable failsafe behavior, and reliable power delivery under changing load.
+
 <div align="center">
  <table>
      <tr>
@@ -46,14 +48,61 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
  </table>
 </div>
 
+### RF Receiver<a name="rfreceiver"></a>
+The car uses an nRF24L01+ module with the RF24 library over SPI to receive drive and steering commands from the handheld controller. In firmware, the radio object is created as `RF24 radio(CE_PIN, CSN_PIN)` with CE on PB0 and CSN on PB1.
+
+The RF stack is configured in `configureRFRadio()` with:
+
+- `radio.begin()` hardware check (halts if radio is not detected)
+- `radio.setPALevel(RF24_PA_LOW)` to reduce TX power/current
+- `radio.enableDynamicPayloads()`
+- `radio.setAutoAck(false)`
+- Pipe/address setup using `"jag-1"` and `"jag-2"`
+- `radio.startListening()` so this node stays in RX mode
+
+An important part of the RF path is Timer0 timing configuration. Because this firmware includes `#include <RF24.h>`, the RF24 stack depends on `millis()`/`micros()` timing for operations such as CE pulse timing, transmit timing windows, retry timing, and transaction spacing.
+
+The RF24 library itself does not directly configure Timer0. Instead, those timing primitives are provided by the Arduino core (`millis()`/`micros()`), and the project sets Timer0 for a 50 us timing base:
+
+```cpp
+TCCR0A = (1 << COM0B1) | (1 << WGM01) | (1 << WGM00);
+TCCR0B = (1 << WGM02) | (1 << CS01); // prescaler = 8
+OCR0A = 49;
+```
+
+At 8 MHz CPU clock with prescaler 8:
+
+- Timer clock = 8 MHz / 8 = 1 MHz
+- Timer tick = 1 us
+- Period = (49 + 1) x 1 us = 50 us
+
+So the Timer0 event period is 50 us (20 kHz). Timer0 is intentionally kept running at this rate so the `millis()`/`micros()` time base used by RF24 remains available and stable.
+
+The receiver expects a `MotorControlPayload` packet with two fields:
+
+- `int16_t ocrMotor` for signed throttle/drive command
+- `uint16_t ocrSteering` for servo pulse width command in microseconds
+
+This payload is 4 bytes total (`2 + 2`), and after reception the car firmware applies it directly:
+
+- `OCR1B = payload.ocrSteering` for steering position
+- `payload.ocrMotor` drives H-bridge direction/speed logic with a deadband of -15 to +15
+
+Reliability/safety behavior tied to RF reception:
+
+- On first valid packet, watchdog is enabled (`WDTO_2S`)
+- Each additional valid packet resets the watchdog
+- If RF packets stop arriving, watchdog timeout forces a reset/failsafe
+
 ### Steering Servo Control<a name="steering"></a>
-Steering is driven by an SG90 servo using Timer1 hardware PWM on OC1B (PD4). The car firmware configures Timer1 in Fast PWM mode 14 with ICR1 as TOP, prescaler = 8, and ICR1 = 20000. With an 8 MHz clock, that gives a 1 us timer tick and about a 50 Hz control period (20 ms), which matches standard hobby servo timing.
+Steering is driven by an MG90S servo using Timer1 hardware PWM on OC1B (PD4). The car firmware configures Timer1 in Fast PWM mode 14 with ICR1 as TOP, prescaler = 8, and ICR1 = 20000. With an 8 MHz clock, that gives a 1 us timer tick and about a 50 Hz control period (20 ms), which matches standard hobby servo timing.
 
-The commanded steering pulse is written directly to OCR1B. In this project, steering values are transmitted as absolute pulse widths in microseconds, centered at 1780 us. On the controller side, joystick input is mapped and clamped to approximately 1400 us to 2160 us (with a center trim offset), then sent over RF. On the car side, OCR1B is updated from the payload each loop:
+The commanded steering pulse is written directly to OCR1B. In this project, steering values are transmitted as absolute pulse widths in microseconds, centered at 1900 us. On the controller side, joystick input is mapped and clamped to approximately 1520 us to 2280 us, then sent over RF. On the car side, OCR1B is updated from the payload each loop:
 
-- Neutral: ~1780 us
-- Left/Right command range: ~1400 us to ~2160 us
+- Neutral: ~1900 us
+- Left/Right command range: ~1520 us to ~2280 us
 - PWM period: ~20 ms (50 Hz)
+- Steering deadzone: +/-90 us around center snaps to 1900 us to reduce twitch
 
 This keeps steering response deterministic because the servo waveform is generated in hardware (Timer1), not by software toggling.
 
@@ -82,11 +131,12 @@ Direction changes are intentionally staged to protect the bridge and drivetrain:
 4. Assert new direction latch (PC0 forward or PC2 reverse)
 5. Re-enable Timer2 PWM
 
-That delay prevents hard instant reversals and reduces shoot-through/braking stress during forward/reverse transitions.
+That delay prevents hard instant reversals and helps ensure MOSFETs on the same side of the H-bridge are not on at the same time during direction transitions, reducing shoot-through/braking stress.
 
 Additional control logic from the car firmware:
 
 - Speed deadband: commands between -15 and +15 stop the motor to avoid joystick/noise creep
+- Steering deadzone: commands within +/-90 us of center are snapped to neutral (1900 us)
 - Direction is only changed when needed (or from stopped state)
 - A watchdog is enabled after first RF packet and reset on each valid packet; if RF traffic is lost, the MCU resets after the watchdog timeout (2 s)
 
@@ -95,9 +145,31 @@ Using Timer2 compare interrupts for every PWM cycle means the MCU is servicing f
 
 In practice, the current tuning (about 5 kHz PWM, deadband around zero, staged direction changes) was a workable sweet spot between motor smoothness and reliable radio updates. A strictly hardware PWM implementation for both drive channels would reduce ISR overhead and leave more CPU time for RF processing.
 
-### RF Receiver<a name="rfreceiver"></a>
-
 ### Power Consumption<a name="powerconsumption"></a>
+This power system was sized around worst-case drive events (motor stall plus active steering), not just average cruising current.
+
+Estimated load envelope:
+
+- 9V drive motor stall current at 7.2V: ~600 mA
+- MG90S steering servo working current: ~600-700 mA
+- Control circuitry (MCU, RF, logic, support electronics): ~20 mA
+
+Worst-case instantaneous estimate:
+
+- Total peak demand: $0.60 + 0.70 + 0.02 \approx 1.32\,A$
+
+Battery capability:
+
+- 2S 200 mAh pack, 20C rating
+- Maximum continuous supply: $0.2\,Ah \times 20 = 4\,A$
+
+Power-stage device headroom:
+
+- IRLML6244 continuous drain current: 6.3 A (comfortably above motor stall current)
+- IRLML2246 continuous source current: -1.3 A (above the ~600 mA motor stall requirement in this bridge path)
+
+Conclusion: the battery and MOSFET current limits provide practical headroom over the expected peak load, so the system can supply drive, steering, and control electronics simultaneously under normal and transient operation.
+
 ---
 ### Parts List<a name="carpartslist"></a>
 |_**Part Number**_|_**Quantity**_|
@@ -125,7 +197,7 @@ In practice, the current tuning (about 5 kHz PWM, deadband around zero, staged d
 |<a href="https://www.digikey.com/en/products/detail/microchip-technology/MIC3975-5-0YMM-TR/1029778">MIC3975-5.0YMM Voltage Regulator</a>| x1 |
 |<a href="https://www.digikey.com/en/products/detail/microchip-technology/MIC5225-3-3YM5-TR/1815447">MIC5225-3.3YM5 Voltage Regulator</a>| x1 |
 |<a href="https://www.digikey.com/en/products/detail/microchip-technology/ATMEGA164A-AU/2271202">ATmega164A-A</a>| x1 |
-|<a href="https://www.amazon.com/Micro-Servos-Helicopter-Airplane-Controls/dp/B07MLR1498/ref=sr_1_6?crid=2U7YPHQQPWA72&dib=eyJ2IjoiMSJ9.DO_8huDXG-WCdEl_xxmMGOc4m-SOLZHCxXbtX_tdiH3QEGU5P18WICxQSL6xcYWhQqOPLEHUu9sa71Q64UcwL7neHYD6CUQnu9wvT2wwK4ZGkDFNOfYnxbijpqOdZKKxCmOtE4j3XZz6xOX_f63TSt9JLIiMxN3DG0seC5RyzpEwr_yxKqqjQwaiqKzfF0LLlJ5IEMt1Yvu7OU-pBllXw2NXHtA4Nk9yhzDBZ44nW3KEf250HyQT_alUX4nBnvgKgZQTpK2CvP6yfaxlUb5at3ONkOKPIqikAtiE-KERbLM._KaHWO6YfP1st1Ba5PZS305amc16ENFTPJT_9hZmXpg&dib_tag=se&keywords=sg90%2Bservo&qid=1776825044&sprefix=sg90%2Caps%2C143&sr=8-6&th=1">SG90 servo motor</a>| x1 |
+|<a href="https://www.amazon.com/dp/B0BWJ4RKGV?ref=ppx_yo2ov_dt_b_fed_asin_title">MG90S servo motor</a>| x1 |
 |<a href="https://www.amazon.com/uxcell-Micro-11500-12000RPM-Remote-Control/dp/B07M99JK6Y/ref=sr_1_6_pp?crid=15ZR5I0IA9JJI&dib=eyJ2IjoiMSJ9.0dTLxilAb6xq-6TUjWUHu4LHY67tPVw3OW_p63iFn0nxHTF8tJOEU3O_Cb8oOwE6WxJZW0BjBXIf0G8GfpGx34Xib0qnggH2QTWBRLxwTrt1dVHrFBr4m3qlymM1dp_HGhddBT5o2u24L-f4An4mHsWxuHhcwAWkuWetTyXovK-j6vw5tc8bw8An9Jwehol9gVoWqmTKBzJJhRpDE5yd1FT2j8fYInDLiEd9pn63in9N35NYOYHjUvUYXkuJJkr2DH7aythkyAL53UUCrgou9nhxGCkFBAQQLPBe2CI7QtI.hByQYkM03NWvQAiFiiVJo0fbgudInFzwV0ohKh8QIlI&dib_tag=se&keywords=9v+motor&qid=1778356523&sprefix=9v+motor%2Caps%2C163&sr=8-6">9V DC Motor</a>| x1 |
 |<a href="https://www.amazon.com/KiNSMART-Jaguar-Project-Metal-Model/dp/B0GXDP3B83/ref=sr_1_2?crid=HY25IPNV0BHN&dib=eyJ2IjoiMSJ9.kNHmPeKKto7l4mN5kOvqBU7R0Xlsnn2LHCeKZya09DTJalbcDjd4JoTcYEG4oBi7Ljllb7X6_TGZSaIGPy1Xm1sebzbI1yp2mHZeyxYMDKpjf4Jqk94GJpw4gnU1N_5tkqw1yrXIqMnX5ZyADOEFBC7UcSktNJJQAYE5tSmkBo9atjGda3yxCk-vgOEnLoZFFx2acgDjpZFOOCdXU92NyMzapczCn7FhwygMaJ_Cei5oG747OONrkMHwEvzIolQ_2xz7kVeILcwJkr2IywmRw9VX98jR5jMxBVIL_H83mhw.naunVJhW78f1ztCTSTYnX7RhDgAuPRFgKA2PJmHRRKo&dib_tag=se&keywords=kinsmart%2B1%3A38&qid=1779063547&sprefix=kinsmart%2B1%2B38%2Caps%2C216&sr=8-2&th=1">Kinsmart Jaguar 1:38</a>| x1 |
 |<a href="https://www.amazon.com/HiLetgo-NRF24L01-Wireless-Transceiver-Module/dp/B00LX47OCY/ref=sr_1_1_sspa?crid=1USO9UOFDEZL5&dib=eyJ2IjoiMSJ9.HpGu4TebgrLEY6IjfmGnCKONGE1zifAy342llWfR4vcsJ4_OTj71wcfjuLFi42g9LnfOsZybnBvz4HCtPFZh7IoO0VCtoV4SHTwJkmzj3SyTmBWTWfYEwK0bZ-6KAhnJqpXuroU3ExNMIQ_0sb6zAw01BAymwhYK7jVncUvl8YxZV7HAVItE-ISceLL5caDSPRu-nl4dzw8eF-t1VvKSdHE_Pz68YolGVn5D4_TDIAE.6OIyGVxp3k88Grsb6QKkfbgzYiEAVdqjkrvRE4yyM6M&dib_tag=se&keywords=nrf24l01&qid=1778356552&sprefix=nrf%2Caps%2C232&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1">NRF24L01+ Module</a>| x1 |

@@ -66,7 +66,7 @@ void configureSteeringPWM(void)
     ICR1 = 20000;
 
     // Set pulse width for neutral servo position to match transmitter center
-    OCR1B = 1780;
+    OCR1B = 1900;
 }
 
 void stopMotor(void)

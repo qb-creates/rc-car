@@ -8,14 +8,12 @@
 
 #include "joystick.h"
 
-static constexpr uint16_t STEERING_CENTER = 1780;
+static constexpr uint16_t STEERING_CENTER = 1900;
 static constexpr int16_t STEERING_RANGE = 380;
 static constexpr uint16_t ADC_CENTER = 512;
 static constexpr int16_t STEERING_MIN = (int16_t)STEERING_CENTER - STEERING_RANGE;
 static constexpr int16_t STEERING_MAX = (int16_t)STEERING_CENTER + STEERING_RANGE;
-static constexpr int16_t STEERING_CENTER_OFFSET_MIN = -120;
-static constexpr int16_t STEERING_CENTER_OFFSET_MAX = 120;
-static constexpr int16_t STEERING_CENTER_OFFSET = 50;
+static constexpr int16_t STEERING_DEADZONE = 90;
 
 /**
  * @brief Initializes the ADC hardware for joystick input.
@@ -73,45 +71,24 @@ int16_t readSpeedJoystick(void)
 /**
  * @brief Reads and maps the steering joystick value to a PWM-compatible range.
  *        Inverts and scales the ADC value to fit servo or motor controller input.
- * @return Steering value in the range 1400-2160 (center 1780).
+ *        Snaps to center when the mapped value is within deadzone.
+ * @return Steering value in the range 1520-2280 (center 1900).
  */
 uint16_t readSteeringJoystick(void)
 {
     uint16_t adcValue = readADC(1);
     adcValue = 1023 - adcValue;
 
-    int16_t centerOffset = STEERING_CENTER_OFFSET;
-    if (centerOffset < STEERING_CENTER_OFFSET_MIN)
-    {
-        centerOffset = STEERING_CENTER_OFFSET_MIN;
-    }
-    else if (centerOffset > STEERING_CENTER_OFFSET_MAX)
-    {
-        centerOffset = STEERING_CENTER_OFFSET_MAX;
-    }
-
     int16_t centeredAdc = (int16_t)adcValue - (int16_t)ADC_CENTER;
-    int16_t steeringCenter = (int16_t)STEERING_CENTER + centerOffset;
-    if (steeringCenter <= STEERING_MIN)
-    {
-        steeringCenter = STEERING_MIN + 1;
-    }
-    else if (steeringCenter >= STEERING_MAX)
-    {
-        steeringCenter = STEERING_MAX - 1;
-    }
-
-    int16_t leftRange = steeringCenter - STEERING_MIN;
-    int16_t rightRange = STEERING_MAX - steeringCenter;
 
     int16_t steeringValue;
     if (centeredAdc < 0)
     {
-        steeringValue = steeringCenter + (int16_t)(((int32_t)centeredAdc * leftRange) / (int32_t)ADC_CENTER);
+        steeringValue = (int16_t)STEERING_CENTER + (int16_t)(((int32_t)centeredAdc * STEERING_RANGE) / (int32_t)ADC_CENTER);
     }
     else
     {
-        steeringValue = steeringCenter + (int16_t)(((int32_t)centeredAdc * rightRange) / (int32_t)(ADC_CENTER - 1));
+        steeringValue = (int16_t)STEERING_CENTER + (int16_t)(((int32_t)centeredAdc * STEERING_RANGE) / (int32_t)(ADC_CENTER - 1));
     }
 
     if (steeringValue < STEERING_MIN)
@@ -121,6 +98,17 @@ uint16_t readSteeringJoystick(void)
     else if (steeringValue > STEERING_MAX)
     {
         steeringValue = STEERING_MAX;
+    }
+
+    int16_t deltaFromCenter = steeringValue - (int16_t)STEERING_CENTER;
+    if (deltaFromCenter < 0)
+    {
+        deltaFromCenter = -deltaFromCenter;
+    }
+
+    if (deltaFromCenter <= STEERING_DEADZONE)
+    {
+        steeringValue = (int16_t)STEERING_CENTER;
     }
 
     return (uint16_t)steeringValue;

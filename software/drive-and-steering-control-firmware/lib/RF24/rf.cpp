@@ -33,7 +33,8 @@ bool rfDataReceived = false;
 
 void configureRFRadio(void)
 {
-    // Set up ms timmer for RF24 library
+    // RF24 relies on millis()/micros() timing, so keep Timer0 running.
+    // At 8 MHz with prescaler 8 and OCR0A=49, Timer0 period is 50 us.
     TCCR0A = (1 << COM0B1) | (1 << WGM01) | (1 << WGM00);
     TCCR0B = (1 << WGM02) | (1 << CS01); // Prescaler = 8
     OCR0A = 49;
