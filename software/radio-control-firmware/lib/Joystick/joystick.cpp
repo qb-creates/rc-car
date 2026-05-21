@@ -8,12 +8,35 @@
 
 #include "joystick.h"
 
+// Steering voltage calibration points in millivolts.
+// These are measured joystick voltages for min/center/max steering positions.
+static constexpr uint16_t STEERING_VOLTAGE_MIN_MV = 3285;
+static constexpr uint16_t STEERING_VOLTAGE_CENTER_MV = 1700;
+static constexpr uint16_t STEERING_VOLTAGE_MAX_MV = 0;
+static constexpr uint16_t ADC_REFERENCE_MV = 3300;
+
 static constexpr uint16_t STEERING_CENTER = 1900;
 static constexpr int16_t STEERING_RANGE = 380;
-static constexpr uint16_t ADC_CENTER = 512;
+
+// Convert measured voltage to the inverted ADC domain used by steering logic
+// (adc = 1023 - readADC(1)).
+static constexpr uint16_t voltageToInvertedADC(uint16_t voltageMv)
+{
+    uint32_t raw = ((uint32_t)voltageMv * 1023u + (ADC_REFERENCE_MV / 2u)) / ADC_REFERENCE_MV;
+    if (raw > 1023u)
+    {
+        raw = 1023u;
+    }
+
+    return (uint16_t)(1023u - raw);
+}
+
+static constexpr uint16_t STEERING_ADC_MIN = voltageToInvertedADC(STEERING_VOLTAGE_MIN_MV);
+static constexpr uint16_t STEERING_ADC_CENTER = voltageToInvertedADC(STEERING_VOLTAGE_CENTER_MV);
+static constexpr uint16_t STEERING_ADC_MAX = voltageToInvertedADC(STEERING_VOLTAGE_MAX_MV);
 static constexpr int16_t STEERING_MIN = (int16_t)STEERING_CENTER - STEERING_RANGE;
 static constexpr int16_t STEERING_MAX = (int16_t)STEERING_CENTER + STEERING_RANGE;
-static constexpr int16_t STEERING_DEADZONE = 90;
+static constexpr int16_t STEERING_DEADZONE = 50;
 
 /**
  * @brief Initializes the ADC hardware for joystick input.
@@ -79,16 +102,18 @@ uint16_t readSteeringJoystick(void)
     uint16_t adcValue = readADC(1);
     adcValue = 1023 - adcValue;
 
-    int16_t centeredAdc = (int16_t)adcValue - (int16_t)ADC_CENTER;
-
     int16_t steeringValue;
-    if (centeredAdc < 0)
+    if (adcValue < STEERING_ADC_CENTER)
     {
-        steeringValue = (int16_t)STEERING_CENTER + (int16_t)(((int32_t)centeredAdc * STEERING_RANGE) / (int32_t)ADC_CENTER);
+        int32_t spanToMin = (int32_t)STEERING_ADC_CENTER - (int32_t)STEERING_ADC_MIN;
+        int32_t deltaFromCenter = (int32_t)adcValue - (int32_t)STEERING_ADC_CENTER;
+        steeringValue = (int16_t)STEERING_CENTER + (int16_t)((deltaFromCenter * STEERING_RANGE) / spanToMin);
     }
     else
     {
-        steeringValue = (int16_t)STEERING_CENTER + (int16_t)(((int32_t)centeredAdc * STEERING_RANGE) / (int32_t)(ADC_CENTER - 1));
+        int32_t spanToMax = (int32_t)STEERING_ADC_MAX - (int32_t)STEERING_ADC_CENTER;
+        int32_t deltaFromCenter = (int32_t)adcValue - (int32_t)STEERING_ADC_CENTER;
+        steeringValue = (int16_t)STEERING_CENTER + (int16_t)((deltaFromCenter * STEERING_RANGE) / spanToMax);
     }
 
     if (steeringValue < STEERING_MIN)
