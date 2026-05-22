@@ -15,7 +15,7 @@ static constexpr uint16_t STEERING_VOLTAGE_CENTER_MV = 1700;
 static constexpr uint16_t STEERING_VOLTAGE_MAX_MV = 0;
 static constexpr uint16_t ADC_REFERENCE_MV = 3300;
 
-static constexpr uint16_t STEERING_CENTER = 1900;
+static constexpr uint16_t STEERING_CENTER = 1950;
 static constexpr int16_t STEERING_RANGE = 380;
 
 // Convert measured voltage to the inverted ADC domain used by steering logic
@@ -36,7 +36,7 @@ static constexpr uint16_t STEERING_ADC_CENTER = voltageToInvertedADC(STEERING_VO
 static constexpr uint16_t STEERING_ADC_MAX = voltageToInvertedADC(STEERING_VOLTAGE_MAX_MV);
 static constexpr int16_t STEERING_MIN = (int16_t)STEERING_CENTER - STEERING_RANGE;
 static constexpr int16_t STEERING_MAX = (int16_t)STEERING_CENTER + STEERING_RANGE;
-static constexpr int16_t STEERING_DEADZONE = 50;
+static constexpr int16_t STEERING_DEADZONE = 100;
 
 /**
  * @brief Initializes the ADC hardware for joystick input.
