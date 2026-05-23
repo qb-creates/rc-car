@@ -1,6 +1,7 @@
 # RC Car Project
-This project is a custom-built remote-controlled (RC) car, designed from the ground up with custom electronics, PCB design, and embedded software for both the car and its remote.
+This project is a custom-built remote-controlled (RC) car, designed from the ground up with custom electronics, PCB design, and embedded firmware for both the car and its remote.
 
+- Project Video (YouTube): https://youtu.be/qdBbDeDglmY
 - Bidirectional Motor Driver (H-Bridge): https://en.wikipedia.org/wiki/H-bridge
 - Steering Servo PWM Control: https://en.wikipedia.org/wiki/Servo_control
 - nRF24L01 Wireless Transceiver Module: https://www.instructables.com/NRF24L01-Tutorial-Arduino-Wireless-Communication/
@@ -29,7 +30,10 @@ This project is a custom-built remote-controlled (RC) car, designed from the gro
     - [Parts List](#remotepartslist)
     - [Schematics](#remoteschematics)
     - [PCB Images](#remotepcbimages)
-4. [STL Viewer](#stlviewer)
+4. [Pin Mapping](#pinmapping)
+    - [Car Controller (ATmega164A)](#carpinmapping)
+    - [Remote Controller (ATmega164A)](#remotepinmapping)
+5. [STL Viewer](#stlviewer)
     - [Car Mechanical Mounts STL](#carmechanicalmountsstl)
     - [Controller Housing STL](#controllerhousingstl)
 
@@ -278,6 +282,14 @@ Throttle is sampled on ADC channel 0, inverted to match intuitive stick directio
 #### Steering Input (Right Analog Stick)<a name="steeringprocessing"></a>
 Steering is sampled on ADC channel 1 and converted using a calibration profile where measured joystick potentiometer minimum, maximum, and center voltages are entered in firmware. The mapping uses those measured endpoints and center value to generate steering pulses, then clamps to the valid steering window before transmission. This makes neutral alignment and left/right travel more accurate than a fixed center assumption. A center deadzone is applied so small stick jitter and ADC noise snap back to neutral, reducing servo chatter and improving straight-line stability.
 
+To measure and enter steering calibration voltages:
+
+1. Power the controller on.
+2. Connect the multimeter to ground and to the X-axis test point by the left controller.
+3. Measure the voltage with the analog stick in its center position (center voltage).
+4. Measure the voltage with the stick moved all the way to the right (minimum voltage for this mapping).
+5. Measure the voltage with the stick moved all the way to the left (maximum voltage for this mapping).
+
 ### Charging Notes<a name="remotecharging"></a>
 The remote has a built-in LiPo charging circuit. When a charger is connected, the controller may automatically power on while charging. You can place the power switch in the OFF position before charging if you prefer it to stay off.
 
@@ -318,7 +330,7 @@ The remote has a built-in LiPo charging circuit. When a charger is connected, th
                     <tr><td><a href="https://www.digikey.com/en/products/detail/microchip-technology/MIC5225-3-3YM5-TR/1815447">MIC5225-3.3YM5 Voltage Regulator</a></td><td align="center">x1</td></tr>
                     <tr><td><a href="https://www.digikey.com/en/products/detail/microchip-technology/ATMEGA164A-AU/2271202">ATmega164A-A</a></td><td align="center">x1</td></tr>
                     <tr><td><a href="https://www.amazon.com/HiLetgo-NRF24L01-Wireless-Transceiver-Module/dp/B00LX47OCY/ref=sr_1_1_sspa?crid=1USO9UOFDEZL5&dib=eyJ2IjoiMSJ9.HpGu4TebgrLEY6IjfmGnCKONGE1zifAy342llWfR4vcsJ4_OTj71wcfjuLFi42g9LnfOsZybnBvz4HCtPFZh7IoO0VCtoV4SHTwJkmzj3SyTmBWTWfYEwK0bZ-6KAhnJqpXuroU3ExNMIQ_0sb6zAw01BAymwhYK7jVncUvl8YxZV7HAVItE-ISceLL5caDSPRu-nl4dzw8eF-t1VvKSdHE_Pz68YolGVn5D4_TDIAE.6OIyGVxp3k88Grsb6QKkfbgzYiEAVdqjkrvRE4yyM6M&dib_tag=se&keywords=nrf24l01&qid=1778356552&sprefix=nrf%2Caps%2C232&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1">NRF24L01+ Module</a></td><td align="center">x1</td></tr>
-                    <tr><td><a href="https://www.amazon.com/EEMB-Rechargeable-Connector-Parrott-Polarity/dp/B0B7R8CS2C/ref=sr_1_9?crid=2PNJXHT8O2BD7&dib=eyJ2IjoiMSJ9.ytY0ATgoZUTp8fkKfIbFwxfJ-RPFGOh8Fljs3SALwOdc0E5um9MqwU3Nf561TyqW5eWp_bfODQRFYKAYV0HQlPTNrv5PexF4DVU2RbBdxKcuSmBcDQuw5ImA3T8MQCieUYtHxHjlPQKIey3tmjioRLIZljCtEmJfrXf2yw62FtfaherhM4QZP-lGmU_qZ4IiXu3H0jwThQ-BqoBcTMGELR8DD_BVenflcsgEmfo4edXbIZRGZtWTI9cXMjF2NkhywL7GquoxWDFoC_LZDs7lVysMe3o4p0KdNnO_wNiqgRM.z8oLo5uD7M9zWKGX-XX1qytnO6Q6kw132uBizXV_u2c&dib_tag=se&keywords=250ma+hour+lipo+battery&qid=1779063612&sprefix=250ma+hour+lipo+battery%2Caps%2C142&sr=8-9">3.7v batter</a></td><td align="center">x1</td></tr>
+                    <tr><td><a href="https://www.amazon.com/EEMB-Rechargeable-Connector-Parrott-Polarity/dp/B0B7R8CS2C/ref=sr_1_9?crid=2PNJXHT8O2BD7&dib=eyJ2IjoiMSJ9.ytY0ATgoZUTp8fkKfIbFwxfJ-RPFGOh8Fljs3SALwOdc0E5um9MqwU3Nf561TyqW5eWp_bfODQRFYKAYV0HQlPTNrv5PexF4DVU2RbBdxKcuSmBcDQuw5ImA3T8MQCieUYtHxHjlPQKIey3tmjioRLIZljCtEmJfrXf2yw62FtfaherhM4QZP-lGmU_qZ4IiXu3H0jwThQ-BqoBcTMGELR8DD_BVenflcsgEmfo4edXbIZRGZtWTI9cXMjF2NkhywL7GquoxWDFoC_LZDs7lVysMe3o4p0KdNnO_wNiqgRM.z8oLo5uD7M9zWKGX-XX1qytnO6Q6kw132uBizXV_u2c&dib_tag=se&keywords=250ma+hour+lipo+battery&qid=1779063612&sprefix=250ma+hour+lipo+battery%2Caps%2C142&sr=8-9">3.7v battery</a></td><td align="center">x1</td></tr>
                     <tr><td><a href="https://www.amazon.com/ruthex-Threaded-Insert-pieces-ultrasound/dp/B088QJG676/ref=sr_1_3?crid=327WC4A3U357H&dib=eyJ2IjoiMSJ9.v_Af1Sv2DMXyynp1rO3uN2cjI_LkHpW2Xd3NuL9RUn1yz2Ym6BTHo47Bnvh-mF3rih3MIxPZyDCFRwN3f8bgTgfOqS-2FD8o-WWmIpuq7XJIrvCSKP6iwhtXO1FB6g2J8vFhgMjuaMVbjKPUpn3U8iuk4FPTnzt9IQcKtjUuxKiJM3PQJf3MPDf15V62fIp3_oibwlJtUKJ7oyWbckn9BPgwhhw0z9gTb7ylLCQjULA.KUBGIt58ag9IJXW2aWAnvHSlQ59y6f_kavaLpQD422E&dib_tag=se&keywords=inserts%2Bm2&qid=1778806075&sprefix=inserts%2Bm%2Caps%2C197&sr=8-3&th=1">M2 Inserts</a></td><td align="center">x10</td></tr>
                     <tr><td><a href="https://www.amazon.com/Phillips-Countersunk-Electronic-Accessories-Samsung/dp/B07HC3LQYS/ref=sr_1_8?crid=2ISFEC45EBS5Q&dib=eyJ2IjoiMSJ9.sToeJ_cHiwrPYQ_C9rq2gwq_BqFxCk_dAqNz8qbKlTKQla66SuHvAVoMEMQE3FrKbT_cXuKk3EDQL7eTiH6WYWt4xdVsIXdoV99uXBCs7qfK_HdB1wotMUmIz4MZM-fYqvCkvNTV6tpBtMOlWfMOOT3xG69H9dmbPd9TCbIKidT_fAgNMZEY2BR0qPmHW3JfhP0KSYKgUQ9dyiHrulr41WxGtIHFVkrdDqeaHCOoUuo.r_V_du0eyowAqg1oQ__QllHDwAeUxV1av7Z4HFjVBKw&dib_tag=se&keywords=m2%2Bscrews&qid=1778806119&sprefix=m2%2Bscrew%2Caps%2C149&sr=8-8&th=1">M2 Screws</a></td><td align="center">x10</td></tr>
                 </table>
@@ -346,20 +358,43 @@ The remote has a built-in LiPo charging circuit. When a charger is connected, th
  </table>
 </div>
 
-## 4. STL Viewer <a name="stlviewer"></a>
+## 4. Pin Mapping <a name="pinmapping"></a>
+ATmega164A/P pin information is from the Microchip datasheet: https://ww1.microchip.com/downloads/en/devicedoc/atmel-8272-8-bit-avr-microcontroller-atmega164a_pa-324a_pa-644a_pa-1284_p_datasheet.pdf
+
+### Car Controller (ATmega164A)<a name="carpinmapping"></a>
+| Signal | MCU Pin | Notes |
+|:--|:--|:--|
+| nRF24 CE | PB0 | Defined as `CE_PIN 0` in car RF firmware |
+| nRF24 CSN | PB1 | Defined as `CSN_PIN 1` in car RF firmware |
+| nRF24 SPI SCK | PB7 | Hardware SPI clock |
+| nRF24 SPI MISO | PB6 | Hardware SPI MISO |
+| nRF24 SPI MOSI | PB5 | Hardware SPI MOSI |
+| nRF24 SPI SS | PB4 | Hardware SPI SS |
+| Steering PWM (OC1B) | PD4 | Servo output (Timer1 OC1B) |
+| Motor Forward Latch | PC0 | H-bridge control |
+| Motor Forward PWM | PC1 | H-bridge control |
+| Motor Reverse Latch | PC2 | H-bridge control |
+| Motor Reverse PWM | PC3 | H-bridge control |
+| Status LED | PD5 | Set during startup/status |
+
+### Remote Controller (ATmega164A)<a name="remotepinmapping"></a>
+| Signal | MCU Pin | Notes |
+|:--|:--|:--|
+| nRF24 CE | PB0 | Defined as `CE_PIN 0` in remote RF firmware |
+| nRF24 CSN | PB1 | Defined as `CSN_PIN 1` in remote RF firmware |
+| nRF24 SPI SCK | PB7 | Hardware SPI clock |
+| nRF24 SPI MISO | PB6 | Hardware SPI MISO |
+| nRF24 SPI MOSI | PB5 | Hardware SPI MOSI |
+| nRF24 SPI SS | PB4 | Hardware SPI SS |
+| Throttle Joystick (Y) ADC | PA0 / ADC0 | Read with `readADC(0)` |
+| Steering Joystick (X) ADC | PA1 / ADC1 | Read with `readADC(1)` |
+
+## 5. STL Viewer <a name="stlviewer"></a>
 ### Car Mechanical Mounts STL <a name="carmechanicalmountsstl"></a>
 - [Car Parts.stl](3d%20print/Car%20Parts.stl)
 
 ### Controller Housing STL <a name="controllerhousingstl"></a>
 - [Controller.stl](3d%20print/Controller.stl)
-
----
-
-### Schematics & PCB
-Schematic and PCB files are available in the `eda/rc-car-kicad/` directory. Example files:
-- `rc-car-kicad.kicad_sch` – Main schematic
-- `rc-car-kicad.kicad_pcb` – Main PCB layout
-- `rc-car-panel.kicad_pcb` – Panelized PCB for manufacturing
 
 ---
 
